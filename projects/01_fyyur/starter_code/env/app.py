@@ -1,6 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
+from flask_migrate import Migrate #migration import
 
 import json
 import dateutil.parser
@@ -20,6 +21,8 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+
+migrate = Migrate(app, db) # BOOTSTRAP DB migration command
 
 # TODO: connect to a local postgresql database
 
