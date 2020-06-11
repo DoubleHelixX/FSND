@@ -10,7 +10,7 @@ DEBUG = True
 
 
 # TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:1@localhost:5432/practice'
+SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:1@localhost:5432/fyyur'
 
 #disable track modifications warning message
 SQLALCHEMY_TRACK_MODIFICATIONS = False
