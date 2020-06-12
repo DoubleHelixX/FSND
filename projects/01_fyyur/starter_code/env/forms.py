@@ -18,7 +18,7 @@ class ShowForm(Form):
 
 class VenueForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()], _name='name'
+        'name', validators=[DataRequired()]
     )
     city = StringField(
         'city', validators=[DataRequired()]
@@ -83,10 +83,10 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone', default ='' #gave default values if left empty
     )
     image_link = StringField(
-        'image_link'
+        'image_link', validators=[URL()], default ='' #gave default values if left empty
     )
     genres = SelectMultipleField(
         # TODO implement enum restriction
@@ -114,7 +114,7 @@ class VenueForm(Form):
         ]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[URL()], default =''
     )
 
 class ArtistForm(Form):
