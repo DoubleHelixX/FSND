@@ -134,7 +134,7 @@ def show_venue(venue_id):
   data1={
     "id": 1,
     "name": "The Musical Hop",
-    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
+    "genres": ["ayo", "ayo", "ayo", "Classical", "Folk"],
     "address": "1015 Folsom Street",
     "city": "San Francisco",
     "state": "CA",
@@ -217,6 +217,7 @@ def show_venue(venue_id):
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
   form = VenueForm()
+  name= request.form.get('name', '')
   return render_template('forms/new_venue.html', form=form)
 
 @app.route('/venues/create', methods=['POST'])
