@@ -1,7 +1,8 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-import manage as m ##migration file import - manage.py class can alternately run as a script instead as well
+# migration file import - manage.py class can alternately run as a script instead as well
+import manage as m
 import json
 import dateutil.parser
 import babel
@@ -21,13 +22,15 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-migration = m.migration(app,db) ## BOOTSTRAP DB migration command with migration file
+# BOOTSTRAP DB migration command with migration file
+migration = m.migration(app, db)
 
 # TODO: connect to a local postgresql database
 
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -38,11 +41,12 @@ class Venue(db.Model):
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120)) # ADDED MISSING COLUMN 
+    genres = db.Column(db.String(120))  # ADDED MISSING COLUMN
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -64,19 +68,22 @@ class Artist(db.Model):
 # Filters.
 #----------------------------------------------------------------------------#
 
+
 def format_datetime(value, format='medium'):
   date = dateutil.parser.parse(value)
   if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
+      format = "EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
-      format="EE MM, dd, y h:mma"
+      format = "EE MM, dd, y h:mma"
   return babel.dates.format_datetime(date, format)
+
 
 app.jinja_env.filters['datetime'] = format_datetime
 
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
+
 
 @app.route('/')
 def index():
@@ -90,28 +97,70 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+  try:
+    #maxCount = db.session.query(Venue.id).count()
+    #print("maxCount", maxCount)
+    mockData = [{
+      "city": "San Francisco",
+      "state": "CA",
+      "venues": [{
+        "id": 1,
+        "name": "The Musical Hop",
+        "num_upcoming_shows": 0,
+      }],
+      }, {"city": "New York",
+      "state": "NY",
+      "venues": [{
+        "id": 2,
+        "name": "The Dueling Pianos Bar",
+        "num_upcoming_shows": 0,
+      }]
+      }]
+    returnData = []
+    dbData = db.session.query(Venue).order_by('id').all()
+    rowArryCheck = []
+    areaData = []
+    venuesData = []
+    #print('data2: ', dbData)
+    for row in dbData:
+      rowIndex=0
+      # print('row: ' , row.id)
+      venueListings = Venue.query.filter_by(
+      state=row.state).order_by('id').all()
+      # print('Venuelisting :  ' , venueListings)
+      for i in venueListings:
+        # print("i.id: " , i.id)
+        # print("rowArryCheck: ", rowArryCheck)
+        # print('true or false: ' ,i.id in rowArryCheck)
+        if (i.id in rowArryCheck):
+          print('true: ', rowArryCheck, '=', i.id)
+        else:
+          rowArryCheck.append(i.id)
+          print( 'Row: ', row , 'i: ' , i, "rowArryCheck is now: ", rowArryCheck )
+          venuesData.append({
+              "id": i.id,
+              "name": i.name,
+              "num_upcoming_shows": 0,
+            })
+          returnData.append({
+            "city": i.city,
+            "state": i.state,
+            "venues": [{
+              "id": i.id,
+              "name": i.name,
+              "num_upcoming_shows": 0,
+            }]
+          }) 
+          #print(returnData)
+     
+      
+      rowIndex = rowIndex+1 
+      # print("rowArryCheck: ", rowArryCheck ,"returnData: ", returnData)
+  except():
+    flash('An error occurred listing the Venues. Redirecting to home page')
+    return redirect(url_for("index"))
+  finally:
+    return render_template('pages/venues.html', areas=returnData)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -223,7 +272,7 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
    try:
-     #retrieve the form values
+     # retrieve the form values
      vName=request.form['name']
      vCity=request.form['city']
      vState=request.form['state']
@@ -234,7 +283,7 @@ def create_venue_submission():
      vFacebook_link=request.form['facebook_link']
      # TODO: insert form data as a new Venue record in the db, instead
      newVenue = Venue(name=vName, city=vCity , state=vState, address=vAddress, phone=vPhone, genres=vGenres, image_link=vImage_link, facebook_link=vFacebook_link)
-     #print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
+     # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
      # TODO: modify data to be the data object returned from db insertion
      db.session.add(newVenue)
      # on successful db insert, flash success
@@ -257,7 +306,7 @@ def delete_venue(venue_id):
  try:
     # Delete clicked selection of Todo list
     Venue.query.filter_by(id = venue_id).delete()
-    #commit delete changes before updating sequence
+    # commit delete changes before updating sequence
     db.session.commit()
     flash('Venue Deleted')
  except:
@@ -268,10 +317,10 @@ def delete_venue(venue_id):
  finally:
     db.session.close()
     return jsonify({"redirect": "/"})
-    #BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    #clicking that button delete it from the db then redirect the user to the homepage
+    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+    # clicking that button delete it from the db then redirect the user to the homepage
   
-#.form.get('description', '')
+# .form.get('description', '')
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
