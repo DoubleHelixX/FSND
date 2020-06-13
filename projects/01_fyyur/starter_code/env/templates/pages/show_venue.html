@@ -1,11 +1,24 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Venue Search{% endblock %}
 {% block content %}
+<style>
+	.venue-delete {
+		-webkit-appearance: none;
+		border-style: ridge;
+		outline: none;
+		color: red;
+		cursor: pointer;
+		font-size: 25px;
+		background-color: white;
+		
+	  }
+</style>
+		
 <div class="row">
 	<div class="col-sm-6">
 		<h1 class="monospace">
-			{{ venue.name }}
-		</h1>
+			{{ venue.name }} <button class="venue-delete" id='btn' data-id="{{ venue.id }}">&cross;</button>
+			</h1>
 		<p class="subtitle">
 			ID: {{ venue.id }}
 		</p>
@@ -74,6 +87,38 @@
 		{% endfor %}
 	</div>
 </section>
-
+<script>
+	const deleteVenue =  document.getElementById("btn");
+	deleteVenue.onclick = function (e) {
+	let proceed =false;
+  	if (confirm("Delete Venue?")) {
+		proceed =true;
+	} else {
+		proceed=false;
+	}
+	if (proceed){
+		const venue_id = e.target.dataset.id;
+		fetch("/venues/" + venue_id , {
+		//post request to that route
+		method: 'DELETE'
+		}).then(function (response) {
+			return response.json();
+		}).then(function (jsonResponse) {
+			// do something with the jsonResponse
+			url = jsonResponse.redirect
+			alert(url)
+			if (url) {
+   			 window.location.href =url;
+			}
+		})
+		.catch(function (e) {
+			console.error(e);
+			alert('Error in DELETE request'); 
+		});
+	}
+	
+}
+</script>
+	
 {% endblock %}
 
