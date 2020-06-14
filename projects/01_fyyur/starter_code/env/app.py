@@ -133,8 +133,8 @@ def venues():
       #print('rowindy: ' , rowIndex)
       rowIndex=0
       cityData=0
-      venueListings = Venue.query.filter_by(state=row.state).order_by('id').all()
-      # print('Venuelisting :  ' , venueListings)
+      venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).order_by('id').all()
+      print('Venuelisting :  ' , venueListings)
       
       for i in venueListings:
         # print("i.id: " , i.id)
@@ -295,7 +295,7 @@ def create_venue_submission():
    try:
      # retrieve the form values
      vName=request.form['name']
-     vCity=request.form['city']
+     vCity=request.form['city'].title()
      vState=request.form['state']
      vAddress=request.form['address']
      vPhone=request.form['phone']
