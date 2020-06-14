@@ -101,61 +101,63 @@ def venues():
     #maxCount = db.session.query(Venue.id).count()
     #print("maxCount", maxCount)
     mockData = [{
-      "city": "San Francisco",
-      "state": "CA",
-      "venues": [{
-        "id": 1,
-        "name": "The Musical Hop",
-        "num_upcoming_shows": 0,
-      }],
-      }, {"city": "New York",
-      "state": "NY",
-      "venues": [{
-        "id": 2,
-        "name": "The Dueling Pianos Bar",
-        "num_upcoming_shows": 0,
-      }]
-      }]
+    "city": "San Francisco",
+    "state": "CA",
+    "venues": [{
+      "id": 1,
+      "name": "The Musical Hop",
+      "num_upcoming_shows": 0,
+    }, {
+      "id": 3,
+      "name": "Park Square Live Music & Coffee",
+      "num_upcoming_shows": 1,
+    }]
+    }, {
+    "city": "New York",
+    "state": "NY",
+    "venues": [{
+      "id": 2,
+      "name": "The Dueling Pianos Bar",
+      "num_upcoming_shows": 0,
+    }]
+    }]
+    
     returnData = []
     dbData = db.session.query(Venue).order_by('id').all()
     rowArryCheck = []
     areaData = []
-    venuesData = []
+    rowIndex=0
     #print('data2: ', dbData)
     for row in dbData:
-      rowIndex=0
-      # print('row: ' , row.id)
-      venueListings = Venue.query.filter_by(
-      state=row.state).order_by('id').all()
+      #print('rowindy: ' , rowIndex)
+      venuesData = []
+      venueListings = Venue.query.filter_by(state=row.state).order_by('id').all()
       # print('Venuelisting :  ' , venueListings)
-      for i in venueListings:
-        # print("i.id: " , i.id)
-        # print("rowArryCheck: ", rowArryCheck)
-        # print('true or false: ' ,i.id in rowArryCheck)
-        if (i.id in rowArryCheck):
-          print('true: ', rowArryCheck, '=', i.id)
-        else:
-          rowArryCheck.append(i.id)
-          print( 'Row: ', row , 'i: ' , i, "rowArryCheck is now: ", rowArryCheck )
-          venuesData.append({
+      if((row.id in rowArryCheck) == False):
+        for i in venueListings:
+          # print("i.id: " , i.id)
+          # print("rowArryCheck: ", rowArryCheck)
+          # print('true or false: ' ,i.id in rowArryCheck)
+          if (i.id in rowArryCheck):
+            print('true: ', rowArryCheck, '=', i.id)
+            areaData.append(i.id)
+            print('mainRow ', areaData) 
+          else:
+            rowArryCheck.append(i.id)
+            print( 'Row: ', row , 'i: ' , i, "rowArryCheck is now: ", rowArryCheck)
+            venuesData.append({
               "id": i.id,
               "name": i.name,
               "num_upcoming_shows": 0,
             })
-          returnData.append({
-            "city": i.city,
-            "state": i.state,
-            "venues": [{
-              "id": i.id,
-              "name": i.name,
-              "num_upcoming_shows": 0,
-            }]
-          }) 
-          #print(returnData)
-     
-      
-      rowIndex = rowIndex+1 
-      # print("rowArryCheck: ", rowArryCheck ,"returnData: ", returnData)
+        returnData.append({
+          "city": row.city,
+          "state": row.state,
+          "venues": venuesData
+        })
+        #print(returnData)
+        #rowIndex = rowIndex+1 
+        #print("rowArryCheck: ", rowArryCheck ,"returnData: ", returnData)
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
     return redirect(url_for("index"))
