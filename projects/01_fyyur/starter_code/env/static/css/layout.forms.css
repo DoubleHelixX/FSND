@@ -15,6 +15,7 @@ body {
 .form-only-page .form .checkbox {
   font-weight: normal;
 }
+
 .form-only-page .form .form-control {
   position: relative;
   font-size: 16px;
@@ -27,6 +28,7 @@ body {
 .form-only-page .form .form-control:focus {
   z-index: 2;
 }
+
 .form-only-page .form input[type="text"],
 .form-only-page .form input[type="password"] {
   margin-bottom: -1px;
@@ -44,3 +46,4 @@ body {
 .form-only-page .back-home {
   margin-top: 10px;
 }
+

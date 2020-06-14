@@ -40,6 +40,13 @@
           <label for="facebook_link">Facebook Link</label>
           {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
         </div>
+        <div class="form-group">
+          <label for="seeking_talent">Seeking Talent</label>
+          <label class ="toggle " for="toggle">Toggle</label>
+          {{ form.seeking_talent(class_ = 'checkbox form-checkbox visually-hidden', id="toggle") }}
+          <div class="control-me"></div>
+        </div>
+
       <input type="submit" value="Create Venue" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>

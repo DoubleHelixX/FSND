@@ -4394,13 +4394,16 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     margin-top: 0;
     margin-bottom: 0;
     vertical-align: middle;
+    cursor: pointer;
   }
   .navbar-form .radio label,
   .navbar-form .checkbox label {
+    cursor: pointer;
     padding-left: 0;
   }
   .navbar-form .radio input[type="radio"],
   .navbar-form .checkbox input[type="checkbox"] {
+    cursor: pointer;
     position: relative;
     margin-left: 0;
   }

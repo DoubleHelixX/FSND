@@ -209,3 +209,54 @@ h2.monospace {
 .subtitle {
   opacity: 0.5;
 }
+.form-checkbox{
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: auto;
+  outline: rgb(255, 153, 0) groove 5px;
+  background: lightgray;
+  height: 16px;
+  width: 16px;
+  border: 1px solid white;
+}
+.form-checkbox:checked{
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: auto;
+  outline: rgb(255, 153, 0) groove 5px;
+  background: rgb(236, 8, 8);
+  height: 16px;
+  width: 16px;
+  border: 1px solid white;
+}
+
+.control-me::after {
+  content: "🐵✔";
+  font-size: 50px;
+  position: relative;
+  left: 2.45em;
+}
+#toggle:checked ~ .control-me::after {
+  content: "🙈❌";
+  position: relative;
+  left: 2.45em;
+}
+
+.toggle {
+  background:rgb(255, 153, 0);
+  padding: 0.5rem 1rem;
+  border-radius: 0.2rem;
+  border-style: ridge;
+  border-color: black;
+  position: relative;
+  left: 1em;
+}
+
+.visually-hidden {
+  position: absolute;
+  left: -100vw;
+  
+  /* Note, you may want to position the checkbox over top the label and set the opacity to zero instead. It can be better for accessibilty on some touch devices for discoverability. */
+}
