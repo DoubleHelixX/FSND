@@ -233,15 +233,21 @@ h2.monospace {
 }
 
 .control-me::after {
-  content: "🐵✔";
+  content: "🙈❌";
   font-size: 50px;
   position: relative;
   left: 2.45em;
 }
+
 #toggle:checked ~ .control-me::after {
-  content: "🙈❌";
+  content: "🐵✔";
   position: relative;
   left: 2.45em;
+}
+
+
+.hide-contents{
+  display: none;
 }
 
 .toggle {

@@ -119,6 +119,9 @@ class VenueForm(Form):
     seeking_talent = BooleanField(
         'seeking_talent', default =False
     )
+    seeking_description = StringField(
+        'seeking_description' #gave default values if left empty
+    )
 
 class ArtistForm(Form):
     name = StringField(
