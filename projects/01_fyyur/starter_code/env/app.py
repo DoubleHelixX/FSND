@@ -44,6 +44,10 @@ class Venue(db.Model):
     genres = db.Column(db.String(120))  # ADDED MISSING COLUMN
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean, default = False)
+    seeking_description = db.Column(db.String(250))
+    #num_upcoming_shows = db.Column(db.Integer)
+    
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -143,7 +147,7 @@ def venues():
         if ((i.id in rowArryCheck) == False):
           rowArryCheck.append(i.id)
           if(rowIndex>0):
-            if((i.city.title()) in areaData):
+            if((i.city) in areaData):
                 venuesData.append({
                 "city": "",
                 "state": "",
@@ -155,7 +159,7 @@ def venues():
                 })
             else:
                 venuesData.append({
-                "city": i.city.title(),
+                "city": i.city,
                 "state": i.state, # place as null to only show city
                 "venues":[{
                 "id": i.id,
@@ -163,11 +167,11 @@ def venues():
                 "num_upcoming_shows": 0,
               }]
                 })
-                areaData.append(i.city.title())
+                areaData.append(i.city)
                 print("after",areaData)
           else:
             venuesData.append({
-            "city": i.city.title(),
+            "city": i.city,
             "state": i.state,
             "venues":[{
             "id": i.id,
@@ -175,7 +179,7 @@ def venues():
             "num_upcoming_shows": 0,
             }]
             })
-            areaData.append(i.city.title())
+            areaData.append(i.city)
             rowIndex=rowIndex+1
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
