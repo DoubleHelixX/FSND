@@ -47,6 +47,7 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default = False)
     seeking_description = db.Column(db.String(250))
+    deleted = db.Column(db.Boolean, default = False)
     #num_upcoming_shows = db.Column(db.Integer)
     
 
@@ -64,6 +65,7 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    deleted = db.Column(db.Boolean, default = False)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -135,53 +137,54 @@ def venues():
     
     #print('data2: ', dbData)
     for row in dbData:
-      #print('rowindy: ' , rowIndex)
-      rowIndex=0
-      cityData=0
-      venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).order_by('id').all()
-      print('Venuelisting :  ' , venueListings)
+      if(row.deleted == False):
+        #print('rowindy: ' , rowIndex)
+        rowIndex=0
+        cityData=0
+        venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).order_by('id').all()
+        print('Venuelisting :  ' , venueListings)
       
-      for i in venueListings:
-        # print("i.id: " , i.id)
-        # print("rowArryCheck: ", rowArryCheck)
-        # print('true or false: ' ,i.id in rowArryCheck)
-        if ((i.id in rowArryCheck) == False):
-          rowArryCheck.append(i.id)
-          if(rowIndex>0):
-            if((i.city) in areaData):
-                venuesData.append({
-                "city": "",
-                "state": "",
-                "venues":[{
-                "id": i.id,
-                "name": i.name,
-                "num_upcoming_shows": 0,
-              }]
-                })
+        for i in venueListings:
+          # print("i.id: " , i.id)
+          # print("rowArryCheck: ", rowArryCheck)
+          # print('true or false: ' ,i.id in rowArryCheck)
+          if ((i.id in rowArryCheck) == False):
+            rowArryCheck.append(i.id)
+            if(rowIndex>0):
+              if((i.city) in areaData):
+                  venuesData.append({
+                  "city": "",
+                  "state": "",
+                  "venues":[{
+                    "id": i.id,
+                    "name": i.name,
+                    "num_upcoming_shows": 0,
+                  }]
+                  })
+              else:
+                  venuesData.append({
+                  "city": i.city,
+                  "state": i.state, # place as null to only show city
+                  "venues":[{
+                    "id": i.id,
+                    "name": i.name,
+                    "num_upcoming_shows": 0,
+                  }]
+                  })
+                  areaData.append(i.city)
+                  print("after",areaData)
             else:
-                venuesData.append({
-                "city": i.city,
-                "state": i.state, # place as null to only show city
-                "venues":[{
+              venuesData.append({
+              "city": i.city,
+              "state": i.state,
+              "venues":[{
                 "id": i.id,
                 "name": i.name,
                 "num_upcoming_shows": 0,
               }]
-                })
-                areaData.append(i.city)
-                print("after",areaData)
-          else:
-            venuesData.append({
-            "city": i.city,
-            "state": i.state,
-            "venues":[{
-            "id": i.id,
-            "name": i.name,
-            "num_upcoming_shows": 0,
-            }]
-            })
-            areaData.append(i.city)
-            rowIndex=rowIndex+1
+              })
+              areaData.append(i.city)
+              rowIndex=rowIndex+1
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
     return redirect(url_for("index"))
@@ -220,15 +223,15 @@ def show_venue(venue_id):
     "seeking_talent": True,
     "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
     "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-    "past_shows": [{
-      "artist_id": 4,
+    "past_shows": [{ # check show table and match show_venue id with venue_id where start_time < current date
+      "artist_id": 4, # match artist_id associated with particular venue_id row and get data below from arist table
       "artist_name": "Guns N Petals",
       "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-      "start_time": "2019-05-21T21:30:00.000Z"
+      "start_time": "2019-05-21T21:30:00.000Z" # get start_time from show table and match show_venue id with venue_id
     }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
+    "upcoming_shows": [], ## check show table and match show_venue id with venue_id where start_time > current date
+    "past_shows_count": 1, #count checked query
+    "upcoming_shows_count": 0, #count checked query
   }
   data2={
     "id": 2,
@@ -284,7 +287,7 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0] #works with 1 dictionary obj
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -344,7 +347,9 @@ def delete_venue(venue_id):
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
  try:
     # Delete clicked selection of Todo list
-    Venue.query.filter_by(id = venue_id).delete()
+    #Venue.query.filter_by(id = venue_id).delete()
+    toBeDeleted = Venue.query.filter_by(id = venue_id).all()
+    toBeDeleted.deleted=True
     # commit delete changes before updating sequence
     db.session.commit()
     flash('Venue Deleted')
