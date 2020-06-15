@@ -236,13 +236,13 @@ h2.monospace {
   content: "🙈❌";
   font-size: 50px;
   position: relative;
-  left: 2.45em;
+  left: 2.65em;
 }
 
 #toggle:checked ~ .control-me::after {
   content: "🐵✔";
   position: relative;
-  left: 2.45em;
+  left: 2.65em;
 }
 
 
@@ -258,6 +258,7 @@ h2.monospace {
   border-color: black;
   position: relative;
   left: 1em;
+  cursor: pointer;
 }
 
 .visually-hidden {

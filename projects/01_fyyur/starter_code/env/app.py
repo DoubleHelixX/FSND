@@ -11,8 +11,9 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from forms import *
+from colorama import Fore , Style
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -306,8 +307,21 @@ def create_venue_submission():
      vGenres=request.form['genres']
      vImage_link=request.form['image_link']
      vFacebook_link=request.form['facebook_link']
+     vSeeking_description=request.form['seeking_description']
+     #Retrieve BooleanField values and test them. work around hack - BooleanField is buggy
+     try:
+       #If it can't read it and causes error its not clicked indicating false
+       vSeeking_talent= request.form['seeking_talent']
+     except:
+       #set it to false
+       vSeeking_talent=False
+     finally:
+       #if the return value is 'y' or anything else other than a bool then set to true
+       if (isinstance(vSeeking_talent, bool) == False):
+         vSeeking_talent=True
+                  
      # TODO: insert form data as a new Venue record in the db, instead
-     newVenue = Venue(name=vName, city=vCity , state=vState, address=vAddress, phone=vPhone, genres=vGenres, image_link=vImage_link, facebook_link=vFacebook_link)
+     newVenue = Venue(name=vName, city=vCity , state=vState, address=vAddress, phone=vPhone, genres=vGenres, image_link=vImage_link, facebook_link=vFacebook_link,seeking_talent=vSeeking_talent, seeking_description=vSeeking_description)
      # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
      # TODO: modify data to be the data object returned from db insertion
      db.session.add(newVenue)
