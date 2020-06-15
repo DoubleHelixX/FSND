@@ -130,61 +130,60 @@ def venues():
     }]
     
     returnData = []
-    dbData = db.session.query(Venue).order_by('id').all()
+    dbData = db.session.query(Venue).filter_by(deleted = False).order_by('id').all()
     rowArryCheck = []
     areaData = []
     venuesData = []
     
     #print('data2: ', dbData)
     for row in dbData:
-      if(row.deleted == False):
-        #print('rowindy: ' , rowIndex)
-        rowIndex=0
-        cityData=0
-        venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).order_by('id').all()
-        print('Venuelisting :  ' , venueListings)
+      #print('rowindy: ' , rowIndex)
+      rowIndex=0
+      cityData=0
+      venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).filter_by(deleted=False).order_by('id').all()
+      print('Venuelisting :  ' , venueListings)
       
-        for i in venueListings:
-          # print("i.id: " , i.id)
-          # print("rowArryCheck: ", rowArryCheck)
-          # print('true or false: ' ,i.id in rowArryCheck)
-          if ((i.id in rowArryCheck) == False):
-            rowArryCheck.append(i.id)
-            if(rowIndex>0):
-              if((i.city) in areaData):
-                  venuesData.append({
-                  "city": "",
-                  "state": "",
-                  "venues":[{
-                    "id": i.id,
-                    "name": i.name,
-                    "num_upcoming_shows": 0,
-                  }]
-                  })
-              else:
-                  venuesData.append({
-                  "city": i.city,
-                  "state": i.state, # place as null to only show city
-                  "venues":[{
-                    "id": i.id,
-                    "name": i.name,
-                    "num_upcoming_shows": 0,
-                  }]
-                  })
-                  areaData.append(i.city)
-                  print("after",areaData)
-            else:
-              venuesData.append({
-              "city": i.city,
-              "state": i.state,
-              "venues":[{
+      for i in venueListings:
+        # print("i.id: " , i.id)
+        # print("rowArryCheck: ", rowArryCheck)
+        # print('true or false: ' ,i.id in rowArryCheck)
+        if ((i.id in rowArryCheck) == False):
+          rowArryCheck.append(i.id)
+          if(rowIndex>0):
+            if((i.city) in areaData):
+                venuesData.append({
+                "city": "",
+                "state": "",
+                "venues":[{
                 "id": i.id,
                 "name": i.name,
                 "num_upcoming_shows": 0,
               }]
-              })
-              areaData.append(i.city)
-              rowIndex=rowIndex+1
+                })
+            else:
+                venuesData.append({
+                "city": i.city,
+                "state": i.state, # place as null to only show city
+                "venues":[{
+                "id": i.id,
+                "name": i.name,
+                "num_upcoming_shows": 0,
+              }]
+                })
+                areaData.append(i.city)
+                print("after",areaData)
+          else:
+            venuesData.append({
+            "city": i.city,
+            "state": i.state,
+            "venues":[{
+            "id": i.id,
+            "name": i.name,
+            "num_upcoming_shows": 0,
+            }]
+            })
+            areaData.append(i.city)
+            rowIndex=rowIndex+1
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
     return redirect(url_for("index"))
