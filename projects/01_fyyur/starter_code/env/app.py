@@ -198,15 +198,45 @@ def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }
-  return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
+  try:
+    mockData={
+      "count": 1,
+      "data": [{
+        "id": 2,
+        "name": "The Dueling Pianos Bar",
+        "num_upcoming_shows": 0,
+      }]
+    }
+    # Get search value from form
+    searchTerm = request.form.get('search_term','').lower()
+    print(f'{Fore.RED} Search Term: ' , searchTerm)
+    perfectMatch =[]
+    goodMatch=[]
+    poorMatch=[]
+    unfilteredMatch=[]
+    count=0
+    for row in db.session.query(Venue).all():
+      if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
+        unfilteredMatch.append({
+        "id": row.id,
+        "name": row.name.title(),
+        "num_upcoming_shows": 0
+      })
+        count = count+1
+    searchResult={
+      "count": count,
+      "data": unfilteredMatch
+    }
+  except:
+    flash('An error occurred when searching for ', searchTerm )
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+    return render_template('pages/search_venues.html', results=searchResult, search_term=searchTerm)
+  return redirect(url_for('venues'))
+  
+
+  
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
@@ -401,15 +431,44 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
+  # Get search value from form
+  try:
+    mockData={
     "count": 1,
     "data": [{
       "id": 4,
       "name": "Guns N Petals",
       "num_upcoming_shows": 0,
     }]
-  }
-  return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+    }
+    # Get search value from form
+    searchTerm = request.form.get('search_term','').lower()
+    print(f'{Fore.RED} Search Term: ' , searchTerm)
+    perfectMatch =[]
+    goodMatch=[]
+    poorMatch=[]
+    unfilteredMatch=[]
+    count=0
+    for row in db.session.query(Artist).all():
+      if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
+        unfilteredMatch.append({
+        "id": row.id,
+        "name": row.name.title(),
+        "num_upcoming_shows": 0
+      })
+        count = count+1
+    
+    searchResult={
+      "count": count,
+      "data": unfilteredMatch
+    } 
+  except:
+    flash('An error occurred when searching for ', searchTerm )
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+    return render_template('pages/search_artists.html', results=searchResult, search_term=searchTerm)
+  return redirect(url_for('artists'))
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
@@ -552,7 +611,7 @@ def edit_venue(venue_id):
     "image_link": currentVenue.image_link
   }
   # TODO: populate form with values from venue with ID <venue_id>
-  return render_template('forms/edit_venue.html', form=form, venue=venue)
+  return render_template('forms/edit_venue.html', form=form, venue=mockVenue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
