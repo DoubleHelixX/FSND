@@ -523,7 +523,7 @@ def edit_venue(venue_id):
   currentVenue = Venue.query.get(venue_id)
   print(f"{Fore.RED} currentVenue: ", currentVenue)
   
-  venue={
+  mockVenue={
     "id": 1,
     "name": "The Musical Hop",
     "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
@@ -536,6 +536,20 @@ def edit_venue(venue_id):
     "seeking_talent": True,
     "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
     "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
+  }
+  venue={
+    "id": currentVenue.id,
+    "name": currentVenue.name,
+    "genres": currentVenue.genres,
+    "address": currentVenue.address,
+    "city": currentVenue.city,
+    "state": currentVenue.state,
+    "phone": currentVenue.phone,
+    "website": currentVenue.website,
+    "facebook_link": currentVenue.facebook_link,
+    "seeking_talent": True,
+    "seeking_description": currentVenue.seeking_description,
+    "image_link": currentVenue.image_link
   }
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
@@ -653,7 +667,7 @@ def create_shows():
   form = ShowForm()
   return render_template('forms/new_show.html', form=form)
 
-@app.route('/shows/create', methods=['POST'])
+@app.route('/shows/create', methods=['POST']) #create datatable
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
