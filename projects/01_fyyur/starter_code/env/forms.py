@@ -186,9 +186,6 @@ class ArtistForm(Form):
             ('WY', 'WY'),
         ]
     )
-    address = StringField(
-        'address', validators=[DataRequired()]
-    )
     phone = StringField(
         'phone', default ='' #gave default values if left empty
     )
@@ -222,6 +219,9 @@ class ArtistForm(Form):
     )
     facebook_link = StringField(
         'facebook_link', validators=[URL()], default =''
+    )
+    website_link = StringField(
+        'website_link', validators=[URL()], default =''
     )
     seeking_venue = BooleanField(
         'seeking_venue', default=False

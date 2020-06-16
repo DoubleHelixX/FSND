@@ -552,7 +552,7 @@ def create_artist_submission():
     a_Name=request.form['name']
     a_City=request.form['city'].title()
     a_State=request.form['state']
-    a_Address=request.form['address']
+    a_Website_link=request.form['website_link']
     a_Phone=request.form['phone']
     a_Genres=request.form['genres']
     a_Image_link=request.form['image_link']
@@ -571,7 +571,7 @@ def create_artist_submission():
         a_Seeking_venue=True
                  
     # TODO: insert form data as a new Venue record in the db, instead
-    newArtist = Artist(name=a_Name, city=a_City , state=a_State, address=a_Address, phone=a_Phone, genres=a_Genres, image_link=a_Image_link, facebook_link=a_Facebook_link,seeking_venue=a_Seeking_venue, seeking_description=a_Seeking_description)
+    newArtist = Artist(name=a_Name, city=a_City , state=a_State, website_link=a_Website_link, phone=a_Phone, genres=a_Genres, image_link=a_Image_link, facebook_link=a_Facebook_link,seeking_venue=a_Seeking_venue, seeking_description=a_Seeking_description)
     # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
     # TODO: modify data to be the data object returned from db insertion
     db.session.add(newArtist)
