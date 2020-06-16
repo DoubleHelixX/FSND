@@ -372,17 +372,29 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO: replace with real data returned from querying the database
-  data=[{
+  try:
+    mockData=[{
     "id": 4,
     "name": "Guns N Petals",
-  }, {
+    }, {
     "id": 5,
     "name": "Matt Quevedo",
-  }, {
+    }, {
     "id": 6,
     "name": "The Wild Sax Band",
-  }]
-  return render_template('pages/artists.html', artists=data)
+    }]
+    returnData=[]
+    allArtist= Artist.query.filter_by(deleted=False).order_by('id').all()
+    for artist in allArtist:
+      data= {
+      "id": artist.id,
+      "name": artist.name
+      }
+      returnData.append(data)
+  except:
+    print(f'{Fore.RED} Error: ', sys.exc_info())
+  finally:
+    return render_template('pages/artists.html', artists=returnData)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
