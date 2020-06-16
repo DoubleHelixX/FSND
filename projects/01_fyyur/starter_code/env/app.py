@@ -507,6 +507,9 @@ def edit_artist_submission(artist_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   form = VenueForm()
+  currentVenue = Venue.query.get(venue_id)
+  print(f"{Fore.RED} currentVenue: ", currentVenue)
+  
   venue={
     "id": 1,
     "name": "The Musical Hop",
@@ -543,12 +546,46 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+  try:
+    # retrieve the form values
+    a_Name=request.form['name']
+    a_City=request.form['city'].title()
+    a_State=request.form['state']
+    a_Address=request.form['address']
+    a_Phone=request.form['phone']
+    a_Genres=request.form['genres']
+    a_Image_link=request.form['image_link']
+    a_Facebook_link=request.form['facebook_link']
+    a_Seeking_description=request.form['seeking_description']
+    #Retrieve BooleanField values and test them. work around hack - BooleanField is buggy
+    try:
+      #If it can't read it and causes error its not clicked indicating false
+      a_Seeking_venue= request.form['seeking_venue']
+    except:
+      #set it to false
+      a_Seeking_venue=False
+    finally:
+      #if the return value is 'y' or anything else other than a bool then set to true
+      if (isinstance(a_Seeking_venue, bool) == False):
+        a_Seeking_venue=True
+                 
+    # TODO: insert form data as a new Venue record in the db, instead
+    newArtist = Artist(name=a_Name, city=a_City , state=a_State, address=a_Address, phone=a_Phone, genres=a_Genres, image_link=a_Image_link, facebook_link=a_Facebook_link,seeking_venue=a_Seeking_venue, seeking_description=a_Seeking_description)
+    # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
+    # TODO: modify data to be the data object returned from db insertion
+    db.session.add(newArtist)
+    # on successful db insert, flash success
+    db.session.commit()
+    flash('Artist ' + a_Name + ' was successfully listed!')
+  except:
+    db.session.rollback()
+    print(sys.exc_info())
+    # TODO: on unsuccessful db insert, flash an error instead.
+    flash('An error occurred. Venue ' + a_Name + ' could not be listed.')
+    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  finally:
+    db.session.close()
+    return redirect(url_for('index'))
 
 
 #  Shows
