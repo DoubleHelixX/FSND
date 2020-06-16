@@ -65,6 +65,8 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean, default = False)
+    seeking_description = db.Column(db.String(250))
     deleted = db.Column(db.Boolean, default = False)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
