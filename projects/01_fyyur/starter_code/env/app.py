@@ -47,13 +47,14 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default = False)
     seeking_description = db.Column(db.String(250))
+    num_of_shows = db.Column(db.Integer, default = 0)
+    shows = db.relationship('Show', backref='venue', lazy=True)
     deleted = db.Column(db.Boolean, default = False)
-    #num_upcoming_shows = db.Column(db.Integer)
     
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-
+    def __repr__(self):
+      return f'<Venue {self.id} {self.name}>'
+    
+    
 class Artist(db.Model):
     __tablename__ = 'artist'
 
@@ -68,11 +69,23 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default = False)
     seeking_description = db.Column(db.String(250))
+    num_of_shows = db.Column(db.Integer, default = 0)
+    shows = db.relationship('Show', backref='artist', lazy=True)
     deleted = db.Column(db.Boolean, default = False)
+    
+    def __repr__(self):
+      return f'<Artist {self.id} {self.name}>'
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+  
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+class Show(db.Model):
+  __tablename__ = 'shows'
+  id = db.Column(db.Integer, primary_key=True)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
+  start_time = db.Column(db.DateTime, nullable=False)
+  
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -107,6 +120,7 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
+  error=False
   try:
     #maxCount = db.session.query(Venue.id).count()
     #print("maxCount", maxCount)
@@ -137,6 +151,7 @@ def venues():
     rowArryCheck = []
     areaData = []
     venuesData = []
+    error=False
     
     #print('data2: ', dbData)
     for row in dbData:
@@ -189,15 +204,19 @@ def venues():
             rowIndex=rowIndex+1
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
-    return redirect(url_for("index"))
+    error =True
   finally:
-    return render_template('pages/venues.html', areas=venuesData)
+    if(error):
+      return redirect(url_for("index"))
+    else:
+      return render_template('pages/venues.html', areas=venuesData)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+  error=False
   try:
     mockData={
       "count": 1,
@@ -232,8 +251,11 @@ def search_venues():
     print(sys.exc_info())
   finally:
     db.session.close()
-    return render_template('pages/search_venues.html', results=searchResult, search_term=searchTerm)
-  return redirect(url_for('venues'))
+    if(error):
+      return redirect(url_for('venues'))
+    else:
+      return render_template('pages/search_venues.html', results=searchResult, search_term=searchTerm)
+
   
 
   
@@ -728,15 +750,55 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST']) #create datatable
 def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
-
-  # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+  error = False
+  date_format = '%Y-%m-%d %H:%M:%S'
+  try:
+    show = Show()
+    form =ShowForm(request.form)
+    
+    if request.method == 'POST' and form.validate():
+      artistID =request.form['artist_id']
+      venueID=request.form['venue_id']
+      startDate = request.form['start_time']
+      
+      venue = Venue.query.get(venueID)
+      artist = Artist.query.get(artistID)
+      if (venue and artist) and not (venue.deleted and artist.deleted):
+        if (venue.seeking_artist and artist.seeking_venue ):
+          show.artist_id = artistID
+          show.venue_id = venueID
+          show.start_time = datetime.strptime(startDate, date_format)
+          venue.num_of_shows = venue.num_of_shows +1
+          artist.num_of_shows = artist.num_of_shows +1
+          db.session.add(show)
+          db.session.commit()
+          # on successful db insert, flash success
+          flash('Show was successfully listed!')
+        else:
+          if (venue.seeking_artist):
+            flash('{venue.name} is not seeking talent - Venue ID: {venueID} ')
+          else: 
+            flash('{artist.name} is not seeking a venue - Artist ID: {artistID} ')
+      else:
+        if not venue:
+          flash('Invalid Venue Id !')
+        if not artist:
+          flash('Invalid Artist Id !')
+    else:
+      print("Validation result : ", form.errors)
+      error = True
+      # TODO: on unsuccessful db insert, flash an error instead.
+      flash('Please fillup the form correctly !')
+  except Exception as e:
+    error = True
+    print(f'{Fore.RED}Error ==> {e}')
+    db.session.rollback()
+  finally:
+    db.session.close()
+    if error:
+      return redirect(url_for('create_shows')) 
+    else:
+      return redirect(url_for('index')) 
 
 @app.errorhandler(404)
 def not_found_error(error):
