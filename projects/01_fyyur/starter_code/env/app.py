@@ -757,17 +757,16 @@ def create_show_submission():
     artistID =request.form['artist_id']
     venueID=request.form['venue_id']
     startDate = request.form['start_time']
-    
     venue = Venue.query.get(venueID)
     artist = Artist.query.get(artistID)
     if (venue and artist) and not (venue.deleted and artist.deleted):
       if (venue.seeking_talent and artist.seeking_venue ):
-        show.talent_id = artistID
+        show.artist_id = artistID
         show.venue_id = venueID
         show.start_time = datetime.strptime(startDate, date_format)
-        venue.num_of_shows = venue.num_of_shows +1
-        artist.num_of_shows = artist.num_of_shows +1
-        db.session.add(show)
+        venue.num_of_shows +=1
+        artist.num_of_shows +=1
+        db.session.add(show) 
         db.session.commit()
         error = False
         flash('Show was successfully listed!')

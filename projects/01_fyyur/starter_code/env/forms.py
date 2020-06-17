@@ -1,9 +1,10 @@
 from datetime import datetime
-from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField, IntegerField
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField, IntegerField, validators,  SubmitField, DecimalField
 from wtforms.validators import DataRequired, AnyOf, URL, NumberRange
 
-class ShowForm(Form):
+
+class ShowForm(FlaskForm):
     artist_id = IntegerField(
         'artist_id', validators=[DataRequired()]
         )
@@ -16,7 +17,7 @@ class ShowForm(Form):
         default= datetime.today()
     )
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -82,10 +83,9 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
-    phone =  IntegerField(
-        'phone', validators = [NumberRange(min=0, max=10)]
-        )
-    print(phone)
+    phone =  StringField(
+        'phone', validators=[NumberRange(min=0, max=12, message='Field only accepts length of 12 ')]
+    )
     image_link = StringField(
         'image_link', validators=[URL()]
     )
@@ -124,7 +124,7 @@ class VenueForm(Form):
         'seeking_description' #gave default values if left empty
     )
 
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -188,7 +188,7 @@ class ArtistForm(Form):
         ]
     )
     phone =  IntegerField(
-        'phone', validators = [NumberRange(min=0, max=10)]
+        'phone', validators=[NumberRange(min=0, max=12, message='Field only accepts length of 12 ')]
     )
     image_link = StringField(
         'image_link', validators=[URL()]
