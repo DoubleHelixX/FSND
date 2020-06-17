@@ -750,47 +750,38 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST']) #create datatable
 def create_show_submission():
-  error = False
+  error = True
   date_format = '%Y-%m-%d %H:%M:%S'
   try:
     show = Show()
-    form =ShowForm(request.form)
+    artistID =request.form['artist_id']
+    venueID=request.form['venue_id']
+    startDate = request.form['start_time']
     
-    if request.method == 'POST' and form.validate():
-      artistID =request.form['artist_id']
-      venueID=request.form['venue_id']
-      startDate = request.form['start_time']
-      
-      venue = Venue.query.get(venueID)
-      artist = Artist.query.get(artistID)
-      if (venue and artist) and not (venue.deleted and artist.deleted):
-        if (venue.seeking_artist and artist.seeking_venue ):
-          show.artist_id = artistID
-          show.venue_id = venueID
-          show.start_time = datetime.strptime(startDate, date_format)
-          venue.num_of_shows = venue.num_of_shows +1
-          artist.num_of_shows = artist.num_of_shows +1
-          db.session.add(show)
-          db.session.commit()
-          # on successful db insert, flash success
-          flash('Show was successfully listed!')
-        else:
-          if (venue.seeking_artist):
-            flash('{venue.name} is not seeking talent - Venue ID: {venueID} ')
-          else: 
-            flash('{artist.name} is not seeking a venue - Artist ID: {artistID} ')
+    venue = Venue.query.get(venueID)
+    artist = Artist.query.get(artistID)
+    if (venue and artist) and not (venue.deleted and artist.deleted):
+      if (venue.seeking_talent and artist.seeking_venue ):
+        show.talent_id = artistID
+        show.venue_id = venueID
+        show.start_time = datetime.strptime(startDate, date_format)
+        venue.num_of_shows = venue.num_of_shows +1
+        artist.num_of_shows = artist.num_of_shows +1
+        db.session.add(show)
+        db.session.commit()
+        error = False
+        flash('Show was successfully listed!')
       else:
-        if not venue:
-          flash('Invalid Venue Id !')
-        if not artist:
-          flash('Invalid Artist Id !')
+        if not artist.seeking_venue: 
+          flash( artist.name + ' is not seeking a venue - Artist ID: ' + artistID)
+        if ( not venue.seeking_talent):
+          flash(venue.name+ ' is not seeking talent - Venue ID: '+ venueID )
     else:
-      print("Validation result : ", form.errors)
-      error = True
-      # TODO: on unsuccessful db insert, flash an error instead.
-      flash('Please fillup the form correctly !')
+      if not (artist or artist.deleted):
+        flash('Invalid Artist Id !')
+      if not (venue or venue.deleted):
+        flash('Invalid Venue Id !')
   except Exception as e:
-    error = True
     print(f'{Fore.RED}Error ==> {e}')
     db.session.rollback()
   finally:

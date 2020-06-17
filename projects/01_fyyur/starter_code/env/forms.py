@@ -85,6 +85,7 @@ class VenueForm(Form):
     phone =  IntegerField(
         'phone', validators = [NumberRange(min=0, max=10)]
         )
+    print(phone)
     image_link = StringField(
         'image_link', validators=[URL()]
     )
