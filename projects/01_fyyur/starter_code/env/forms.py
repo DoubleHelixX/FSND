@@ -114,6 +114,9 @@ class VenueForm(FlaskForm):
             ('Other', 'Other'),
         ]
     )
+    website_link = StringField(
+        'website_link', validators=[URL()], default =''
+    )
     facebook_link = StringField(
         'facebook_link', validators=[URL()], default =''
     )

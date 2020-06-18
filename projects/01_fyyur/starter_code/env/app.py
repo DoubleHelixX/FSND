@@ -42,7 +42,8 @@ class Venue(db.Model):
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))  # ADDED MISSING COLUMN
+    genres = db.Column(db.String(120)) 
+    website_link = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default = False)
@@ -271,9 +272,9 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
-  data1={
+  error=True
+  try:
+    data1={
     "id": 1,
     "name": "The Musical Hop",
     "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
@@ -295,8 +296,8 @@ def show_venue(venue_id):
     "upcoming_shows": [], ## check show table and match show_venue id with venue_id where start_time > current date
     "past_shows_count": 1, #count checked query
     "upcoming_shows_count": 0, #count checked query
-  }
-  data2={
+    }
+    data2={
     "id": 2,
     "name": "The Dueling Pianos Bar",
     "genres": ["Classical", "R&B", "Hip-Hop"],
@@ -312,8 +313,8 @@ def show_venue(venue_id):
     "upcoming_shows": [],
     "past_shows_count": 0,
     "upcoming_shows_count": 0,
-  }
-  data3={
+    }
+    data3={
     "id": 3,
     "name": "Park Square Live Music & Coffee",
     "genres": ["Rock n Roll", "Jazz", "Classical", "Folk"],
@@ -349,9 +350,82 @@ def show_venue(venue_id):
     }],
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
-  }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0] #works with 1 dictionary obj
-  return render_template('pages/show_venue.html', venue=data)
+    }
+    resultData=[]
+    venueData = db.session.query(Venue).filter(Venue.deleted == False).all()
+    for venue in venueData:
+      pastShowsCount =0
+      upcomingShowsCount=0
+      pastShows=[]
+      upcomingShows=[]
+      if venue.num_of_shows >0:
+        showsData = db.session.query(Show, Artist).filter(Show.venue_id == venue.id).filter(Artist.id == Show.artist_id).all()
+        for shows in showsData:
+          print(f'{Fore.YELLOW} shows: {shows}')
+          if shows[0].start_time > datetime.today(): 
+            upcomingShowsCount +=1
+            upcomingShows.append({
+            "artist_id": shows[1].id,
+            "artist_name": shows[1].name,
+            "artist_image_link": shows[1].image_link,
+            "start_time": str(shows[0].start_time)
+            })
+          else: 
+            pastShowsCount +=1
+            pastShows.append({
+              "artist_id": shows[1].id,
+              "artist_name": shows[1].name,
+              "artist_image_link": shows[1].image_link,
+              "start_time": str(shows[0].start_time)
+              
+            })
+        
+        resultData.append({
+          "id": venue.id,
+          "name": venue.name,
+          "genres": [venue.genres],
+          "address": venue.address,
+          "city": venue.city,
+          "state": venue.state,
+          "phone": venue.phone,
+          "website":venue.website_link,
+          "facebook_link": venue.facebook_link,
+          "seeking_talent": venue.seeking_talent,
+          "image_link": venue.image_link,
+          "past_shows": pastShows,
+          "upcoming_shows": upcomingShows,
+          "past_shows_count": pastShowsCount,
+          "upcoming_shows_count": upcomingShowsCount, 
+        })  
+      else:
+        resultData.append({
+          "id": venue.id,
+          "name": venue.name,
+          "genres": [venue.genres],
+          "address": venue.address,
+          "city": venue.city,
+          "state": venue.state,
+          "phone": venue.phone,
+          "website":venue.website_link,
+          "facebook_link": venue.facebook_link,
+          "seeking_venue": venue.seeking_talent,
+          "image_link": venue.image_link,
+          "past_shows": pastShows,
+          "upcoming_shows": upcomingShows,
+          "past_shows_count": pastShowsCount,
+          "upcoming_shows_count": upcomingShowsCount, 
+        }) 
+    error=False 
+    data = list(filter(lambda d: d['id'] == venue_id, resultData))[0] #works with 1 dictionary obj
+  except expression as identifier:
+    error=True
+    print(f'{Fore.Yellow} Error Message: ' , identifier)
+    flash('Error when accessing Database: Contact Customer Support if issue persist.')
+  finally:
+    if error: redirect(url_for('index'))
+    else: return render_template('pages/show_venue.html', venue=data)
+    
+  
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -372,6 +446,7 @@ def create_venue_submission():
      vAddress=form.address.data
      vPhone=form.phone.data
      vGenres=form.genres.data
+     vWebsite_link = form.website_link.data
      vImage_link=form.image_link.data
      vFacebook_link=form.facebook_link.data
      vSeeking_description=form.seeking_description.data
@@ -388,7 +463,7 @@ def create_venue_submission():
          vSeeking_talent=True
                   
      # TODO: insert form data as a new Venue record in the db, instead
-     newVenue = Venue(name=vName, city=vCity , state=vState, address=vAddress, phone=vPhone, genres=vGenres, image_link=vImage_link, facebook_link=vFacebook_link,seeking_talent=vSeeking_talent, seeking_description=vSeeking_description)
+     newVenue = Venue(name=vName, city=vCity , state=vState, address=vAddress, phone=vPhone, genres=vGenres, image_link=vImage_link, facebook_link=vFacebook_link,seeking_talent=vSeeking_talent, seeking_description=vSeeking_description, website_link = vWebsite_link )
      # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
      # TODO: modify data to be the data object returned from db insertion
      db.session.add(newVenue)
