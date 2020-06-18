@@ -85,6 +85,8 @@ class Show(db.Model):
   artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
   venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
   start_time = db.Column(db.DateTime, nullable=False)
+  deleted = db.Column(db.Boolean, default = False)
+  
   
 
 #----------------------------------------------------------------------------#
