@@ -1,10 +1,23 @@
 {% extends 'layouts/main.html' %}
 {% block title %}{{ artist.name }} | Artist{% endblock %}
 {% block content %}
+<style>
+	.artist-delete {
+		-webkit-appearance: none;
+		border-style: ridge;
+		outline: none;
+		color: red;
+		cursor: pointer;
+		font-size: 25px;
+		background-color: white;
+		
+	  }
+</style>
+		
 <div class="row">
 	<div class="col-sm-6">
 		<h1 class="monospace">
-			{{ artist.name }}
+			{{ artist.name }} <button class="artist-delete" id='btn' data-id="{{ artist.id }}">&cross;</button>
 		</h1>
 		<p class="subtitle">
 			ID: {{ artist.id }}
@@ -71,6 +84,36 @@
 		{% endfor %}
 	</div>
 </section>
-
+<script>
+	const deleteArtist =  document.getElementById("btn");
+	deleteArtist.onclick = function (e) {
+	let proceed =false;
+  	if (confirm("Delete Artist?")) {
+		proceed =true;
+	} else {
+		proceed=false;
+	}
+	if (proceed){
+		const artist_id = e.target.dataset.id;
+		fetch("/artist/" + artist_id , {
+		//post request to that route
+		method: 'DELETE'
+		}).then(function (response) {
+			return response.json();
+		}).then(function (jsonResponse) {
+			// do something with the jsonResponse
+			url = jsonResponse.redirect
+			if (url) {
+   			 window.location.href =url;
+			}
+		})
+		.catch(function (e) {
+			console.error(e);
+			alert('Error in DELETE request'); 
+		});
+	}
+	
+}
+</script>
 {% endblock %}
 

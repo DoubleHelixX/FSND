@@ -488,10 +488,8 @@ def delete_venue(venue_id):
     # TODO: Complete this endpoint for taking a venue_id, and using
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
  try:
-    # Delete clicked selection of Todo list
-    #Venue.query.filter(id = venue_id).delete()
-    toBeDeleted = Venue.query.filter(Venue.id == venue_id).all()
-    toBeDeleted.deleted=True
+    toBeDeleted = db.session.query(Venue).filter_by(id=venue_id).all()
+    toBeDeleted[0].deleted=True
     # commit delete changes before updating sequence
     db.session.commit()
     flash('Venue Deleted')
@@ -503,11 +501,29 @@ def delete_venue(venue_id):
  finally:
     db.session.close()
     return jsonify({"redirect": "/"})
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
+   
   
-# .form.get('description', '')
-#  Artists
+@app.route('/artist/<artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+    # TODO: Complete this endpoint for taking a venue_id, and using
+    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+ try:
+    # Delete clicked selection of Todo list
+    #Venue.query.filter(id = venue_id).delete()
+    toBeDeleted = db.session.query(Artist).filter_by(id=artist_id).all()
+    toBeDeleted[0].deleted=True
+    # commit delete changes before updating sequence
+    db.session.commit()
+    flash('Artist Deleted')
+ except:
+    print('Could not delete: ' ,artist_id)
+    flash('An error occurred. Artist could not be deleted.')
+    print(sys.exc_info())
+    db.session.rollback()
+ finally:
+    db.session.close()
+    return jsonify({"redirect": "/"})
+
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
