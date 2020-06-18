@@ -159,12 +159,15 @@ def venues():
       rowIndex=0
       cityData=0
       venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).filter_by(deleted=False).order_by('id').all()
-      print('Venuelisting :  ' , venueListings)
+      #print('Venuelisting :  ' , venueListings)
       
       for i in venueListings:
-        # print("i.id: " , i.id)
-        # print("rowArryCheck: ", rowArryCheck)
-        # print('true or false: ' ,i.id in rowArryCheck)
+        upcoming_shows = 0
+        matchedVenues = Show.query.filter_by(venue_id = i.id).all()
+        if(matchedVenues):
+          for venues in matchedVenues:
+            if venues.start_time > datetime.today(): upcoming_shows =+1
+              
         if ((i.id in rowArryCheck) == False):
           rowArryCheck.append(i.id)
           if(rowIndex>0):
@@ -175,7 +178,7 @@ def venues():
                 "venues":[{
                 "id": i.id,
                 "name": i.name,
-                "num_upcoming_shows": 0,
+                "num_upcoming_shows": upcoming_shows,
               }]
                 })
             else:
@@ -185,7 +188,7 @@ def venues():
                 "venues":[{
                 "id": i.id,
                 "name": i.name,
-                "num_upcoming_shows": 0,
+                "num_upcoming_shows": upcoming_shows,
               }]
                 })
                 areaData.append(i.city)
@@ -197,7 +200,7 @@ def venues():
             "venues":[{
             "id": i.id,
             "name": i.name,
-            "num_upcoming_shows": 0,
+            "num_upcoming_shows": upcoming_shows,
             }]
             })
             areaData.append(i.city)
