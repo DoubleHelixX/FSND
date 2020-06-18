@@ -238,12 +238,17 @@ def search_venues():
     unfilteredMatch=[]
     count=0
     for row in db.session.query(Venue).all():
+      upcoming_shows = 0
+      matchedVenues = Show.query.filter_by(venue_id = row.id).all()
+      if(matchedVenues):
+        for venues in matchedVenues:
+          if venues.start_time > datetime.today(): upcoming_shows =+1
       if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
         unfilteredMatch.append({
         "id": row.id,
         "name": row.name.title(),
-        "num_upcoming_shows": 0
-      })
+        "num_upcoming_shows": upcoming_shows
+        })
         count = count+1
     searchResult={
       "count": count,
@@ -358,20 +363,21 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
    try:
+     form = VenueForm(request.form)
      # retrieve the form values
-     vName=request.form['name']
-     vCity=request.form['city'].title()
-     vState=request.form['state']
-     vAddress=request.form['address']
-     vPhone=request.form['phone']
-     vGenres=request.form['genres']
-     vImage_link=request.form['image_link']
-     vFacebook_link=request.form['facebook_link']
-     vSeeking_description=request.form['seeking_description']
+     vName=form.name.data
+     vCity=form.city.data.title()
+     vState=form.state.data
+     vAddress=form.address.data
+     vPhone=form.phone.data
+     vGenres=form.genres.data
+     vImage_link=form.image_link.data
+     vFacebook_link=form.facebook_link.data
+     vSeeking_description=form.seeking_description.data
      #Retrieve BooleanField values and test them. work around hack - BooleanField is buggy
      try:
        #If it can't read it and causes error its not clicked indicating false
-       vSeeking_talent= request.form['seeking_talent']
+       vSeeking_talent= form.seeking_talent.data
      except:
        #set it to false
        vSeeking_talent=False
@@ -475,11 +481,16 @@ def search_artists():
     unfilteredMatch=[]
     count=0
     for row in db.session.query(Artist).all():
+      upcoming_shows = 0
+      matchedVenues = Show.query.filter_by(venue_id = row.id).all()
+      if(matchedVenues):
+        for venues in matchedVenues:
+          if venues.start_time > datetime.today(): upcoming_shows =+1
       if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
         unfilteredMatch.append({
         "id": row.id,
         "name": row.name.title(),
-        "num_upcoming_shows": 0
+        "num_upcoming_shows": upcoming_shows
       })
         count = count+1
     
@@ -727,20 +738,24 @@ def create_artist_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
   try:
+    form = ArtistForm(request.form)
     # retrieve the form values
-    a_Name=request.form['name']
-    a_City=request.form['city'].title()
-    a_State=request.form['state']
-    a_Website_link=request.form['website_link']
-    a_Phone=request.form['phone']
-    a_Genres=request.form['genres']
-    a_Image_link=request.form['image_link']
-    a_Facebook_link=request.form['facebook_link']
-    a_Seeking_description=request.form['seeking_description']
+    a_Name=form.name.data
+    a_City=form.city.data.title()
+    a_State=form.state.data
+    a_Website_link=form.website_link.data
+    a_Phone=form.phone.data
+    a_Genres=form.genres.data
+    a_Image_link=form.image_link.data
+    a_Facebook_link=form.facebook_link.data
+    a_Seeking_description=form.seeking_description.data
+    print(f'{Fore.YELLOW} omggg')
+    print(f'{Fore.YELLOW} Generes1:' , a_Name)  
+    
     #Retrieve BooleanField values and test them. work around hack - BooleanField is buggy
     try:
       #If it can't read it and causes error its not clicked indicating false
-      a_Seeking_venue= request.form['seeking_venue']
+      a_Seeking_venue= form.seeking_venue.data
     except:
       #set it to false
       a_Seeking_venue=False
@@ -748,7 +763,6 @@ def create_artist_submission():
       #if the return value is 'y' or anything else other than a bool then set to true
       if (isinstance(a_Seeking_venue, bool) == False):
         a_Seeking_venue=True
-                 
     # TODO: insert form data as a new Venue record in the db, instead
     newArtist = Artist(name=a_Name, city=a_City , state=a_State, website_link=a_Website_link, phone=a_Phone, genres=a_Genres, image_link=a_Image_link, facebook_link=a_Facebook_link,seeking_venue=a_Seeking_venue, seeking_description=a_Seeking_description)
     # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
@@ -838,12 +852,13 @@ def create_shows():
 @app.route('/shows/create', methods=['POST']) #create datatable
 def create_show_submission():
   error = True
-  date_format = '%Y-%m-%d %H:%M:%S'
   try:
+    date_format = '%Y-%m-%d %H:%M:%S'
     show = Show()
-    artistID =request.form['artist_id']
-    venueID=request.form['venue_id']
-    startDate = request.form['start_time']
+    form = ShowForm(request.form)
+    artistID =form.artist_id.data
+    venueID=form.venue_id.data
+    startDate = form.start_time.data
     venue = Venue.query.get(venueID)
     artist = Artist.query.get(artistID)
     if (venue and artist) and not (venue.deleted and artist.deleted):
