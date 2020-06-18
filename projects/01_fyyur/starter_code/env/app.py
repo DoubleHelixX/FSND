@@ -149,7 +149,7 @@ def venues():
     }]
     
     returnData = []
-    dbData = db.session.query(Venue).filter_by(deleted = False).order_by('id').all()
+    dbData = db.session.query(Venue).filter(Venue.deleted == False).order_by('id').all()
     rowArryCheck = []
     areaData = []
     venuesData = []
@@ -160,16 +160,15 @@ def venues():
       #print('rowindy: ' , rowIndex)
       rowIndex=0
       cityData=0
-      venueListings = Venue.query.filter_by(state=row.state).filter_by(city = row.city).filter_by(deleted=False).order_by('id').all()
-      #print('Venuelisting :  ' , venueListings)
-      
+      print(f'{Fore.YELLOW} omgg :')
+      venueListings = Venue.query.filter(Venue.state==row.state).filter(Venue.city == row.city).filter(Venue.deleted==False).order_by('id').all()
+      print(f'{Fore.YELLOW} Venuelisting :  ' , venueListings)
       for i in venueListings:
         upcoming_shows = 0
-        matchedVenues = Show.query.filter_by(venue_id = i.id).all()
+        matchedVenues = Show.query.filter(Show.venue_id == i.id).filter(Show.deleted==False).all()
         if(matchedVenues):
           for venues in matchedVenues:
-            if venues.start_time > datetime.today(): upcoming_shows =+1
-              
+            if venues.start_time > datetime.today(): upcoming_shows =+1      
         if ((i.id in rowArryCheck) == False):
           rowArryCheck.append(i.id)
           if(rowIndex>0):
@@ -239,9 +238,9 @@ def search_venues():
     poorMatch=[]
     unfilteredMatch=[]
     count=0
-    for row in db.session.query(Venue).all():
+    for row in db.session.query(Venue).filter(Venue.deleted==False).all():
       upcoming_shows = 0
-      matchedVenues = Show.query.filter_by(venue_id = row.id).all()
+      matchedVenues = Show.query.filter(Show.venue_id == row.id).all()
       if(matchedVenues):
         for venues in matchedVenues:
           if venues.start_time > datetime.today(): upcoming_shows =+1
@@ -412,8 +411,8 @@ def delete_venue(venue_id):
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
  try:
     # Delete clicked selection of Todo list
-    #Venue.query.filter_by(id = venue_id).delete()
-    toBeDeleted = Venue.query.filter_by(id = venue_id).all()
+    #Venue.query.filter(id = venue_id).delete()
+    toBeDeleted = Venue.query.filter(Venue.id == venue_id).all()
     toBeDeleted.deleted=True
     # commit delete changes before updating sequence
     db.session.commit()
@@ -447,7 +446,7 @@ def artists():
     "name": "The Wild Sax Band",
     }]
     returnData=[]
-    allArtist= Artist.query.filter_by(deleted=False).order_by('id').all()
+    allArtist= Artist.query.filter(Artist.deleted==False).order_by('id').all()
     for artist in allArtist:
       data= {
       "id": artist.id,
@@ -482,9 +481,9 @@ def search_artists():
     poorMatch=[]
     unfilteredMatch=[]
     count=0
-    for row in db.session.query(Artist).all():
+    for row in db.session.query(Artist).filter(Artist.deleted==False).all():
       upcoming_shows = 0
-      matchedVenues = Show.query.filter_by(venue_id = row.id).all()
+      matchedVenues = Show.query.filter(Show.venue_id == row.id).all()
       if(matchedVenues):
         for venues in matchedVenues:
           if venues.start_time > datetime.today(): upcoming_shows =+1
@@ -585,7 +584,7 @@ def show_artist(artist_id):
       "upcoming_shows_count": 3,
     }
     
-    artistsData = db.session.query(Artist).all()
+    artistsData = db.session.query(Artist).filter(Artist.deleted == False).all()
     for artist in artistsData:
       pastShowsCount =0
       upcomingShowsCount=0
@@ -713,7 +712,7 @@ def edit_venue(venue_id):
     "phone": currentVenue.phone,
     "website": currentVenue.website,
     "facebook_link": currentVenue.facebook_link,
-    "seeking_talent": True,
+    "seeking_talent": currentVenue.seeking_talent,
     "seeking_description": currentVenue.seeking_description,
     "image_link": currentVenue.image_link
   }
@@ -829,14 +828,17 @@ def shows():
     }]
     showsData = db.session.query(Show, Artist, Venue).filter(Show.artist_id == Artist.id).filter(Venue.id == Show.venue_id).all()
     for shows in showsData:
-      resultData.append({
-      "venue_id": shows[2].id,
-      "venue_name": shows[2].name,
-      "artist_id": shows[1].id,
-      "artist_name": shows[1].name,
-      "artist_image_link": shows[1].image_link,
-      "start_time": str(shows[0].start_time)
-    })
+      if shows[1].deleted and shows[2].deleted:
+        shows[0].deleted= True
+      if not shows[0].deleted: 
+        resultData.append({
+        "venue_id": shows[2].id,
+        "venue_name": shows[2].name,
+        "artist_id": shows[1].id,
+        "artist_name": shows[1].name,
+        "artist_image_link": shows[1].image_link,
+        "start_time": str(shows[0].start_time)
+      })
     print(f'{Fore.BLUE} result Data: {resultData}')
   except expression as identifier:
     db.session.rollback()
