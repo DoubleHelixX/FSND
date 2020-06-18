@@ -570,6 +570,16 @@ def show_artist(artist_id):
     "past_shows_count": 0,
     "upcoming_shows_count": 3,
   }
+  
+  
+  showsData = db.session.query(Show, Artist, Venue).filter(Show.artist_id == Artist.id).filter(Venue.id == Show.venue_id).all()
+  for shows in showsData:
+    print(f'{Fore.YELLOW} shows: {shows}')
+    for show in shows:
+      print(f'{Fore.GREEN} show: {show}')
+      print(f'{Fore.RED} data: {show.id}')
+       
+       
   data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   return render_template('pages/show_artist.html', artist=data)
 
@@ -705,6 +715,7 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   try:
+    resultData=[]
     mockData=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
@@ -712,47 +723,52 @@ def shows():
     "artist_name": "Guns N Petals",
     "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
     "start_time": "2019-05-21T21:30:00.000Z"
-  }, {
+    }, {
     "venue_id": 3,
     "venue_name": "Park Square Live Music & Coffee",
     "artist_id": 5,
     "artist_name": "Matt Quevedo",
     "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
     "start_time": "2019-06-15T23:00:00.000Z"
-  }, {
+    }, {
     "venue_id": 3,
     "venue_name": "Park Square Live Music & Coffee",
     "artist_id": 6,
     "artist_name": "The Wild Sax Band",
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-01T20:00:00.000Z"
-  }, {
+    }, {
     "venue_id": 3,
     "venue_name": "Park Square Live Music & Coffee",
     "artist_id": 6,
     "artist_name": "The Wild Sax Band",
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-08T20:00:00.000Z"
-  }, {
+    }, {
     "venue_id": 3,
     "venue_name": "Park Square Live Music & Coffee",
     "artist_id": 6,
     "artist_name": "The Wild Sax Band",
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
-  }]
+    }]
     showsData = db.session.query(Show, Artist, Venue).filter(Show.artist_id == Artist.id).filter(Venue.id == Show.venue_id).all()
     for shows in showsData:
-      print(f'{Fore.YELLOW} shows: {shows}')
-      for show in shows:
-       print(f'{Fore.GREEN} show: {show}')
-       print(f'{Fore.RED} data: {show.id}')
-         
-        
+      resultData.append({
+      "venue_id": shows[2].id,
+      "venue_name": shows[2].name,
+      "artist_id": shows[1].id,
+      "artist_name": shows[1].name,
+      "artist_image_link": shows[1].image_link,
+      "start_time": str(shows[0].start_time)
+    })
+    print(f'{Fore.BLUE} result Data: {resultData}')
   except expression as identifier:
-    pass
+    db.session.rollback()
+    print(identifier)
+    flash('An error occurred.')
   finally:
-    return render_template('pages/shows.html', shows=mockData)
+    return render_template('pages/shows.html', shows=resultData)
 
 @app.route('/shows/create')
 def create_shows():
