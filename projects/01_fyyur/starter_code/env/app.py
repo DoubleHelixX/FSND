@@ -374,7 +374,7 @@ def show_venue(venue_id):
       upcomingShowsCount=0
       pastShows=[]
       upcomingShows=[]
-      genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', venue.genres ))).split(',')
+      genres="".join(list(filter(lambda x : x!= '{' and x!='}', venue.genres ))).split(',')
       if venue.num_of_shows >0:
         showsData = db.session.query(Show, Artist).filter(Show.venue_id == venue.id).filter(Artist.id == Show.artist_id).all()
         for shows in showsData:
@@ -408,6 +408,7 @@ def show_venue(venue_id):
           "website":venue.website_link,
           "facebook_link": venue.facebook_link,
           "seeking_talent": venue.seeking_talent,
+          "seeking_description":venue.seeking_description,
           "image_link": venue.image_link,
           "past_shows": pastShows,
           "upcoming_shows": upcomingShows,
@@ -425,7 +426,8 @@ def show_venue(venue_id):
           "phone": venue.phone,
           "website":venue.website_link,
           "facebook_link": venue.facebook_link,
-          "seeking_venue": venue.seeking_talent,
+          "seeking_talent": venue.seeking_talent,
+          "seeking_description":venue.seeking_description,
           "image_link": venue.image_link,
           "past_shows": pastShows,
           "upcoming_shows": upcomingShows,
@@ -733,6 +735,7 @@ def show_artist(artist_id):
           "phone": artist.phone,
           "facebook_link": artist.facebook_link,
           "seeking_venue": artist.seeking_venue,
+          "seeking_description":artist.seeking_description,
           "image_link": artist.image_link,
           "past_shows": pastShows,
           "upcoming_shows": upcomingShows,
@@ -749,6 +752,7 @@ def show_artist(artist_id):
           "phone": artist.phone,
           "facebook_link": artist.facebook_link,
           "seeking_venue": artist.seeking_venue,
+          "seeking_description":artist.seeking_description,
           "image_link": artist.image_link,
           "past_shows": pastShows,
           "upcoming_shows": upcomingShows,
