@@ -1042,31 +1042,39 @@ def create_show_submission():
     form = ShowForm(request.form)
     artistID =form.artist_id.data
     venueID=form.venue_id.data
-    startDate = form.start_time.data
-    venue = Venue.query.get(venueID)
-    artist = Artist.query.get(artistID)
-    if (venue and artist) and not (venue.deleted and artist.deleted):
-      if (venue.seeking_talent and artist.seeking_venue ):
-        show.artist_id = artistID
-        show.venue_id = venueID
-        show.start_time = datetime.strptime(startDate, date_format)
-        venue.num_of_shows +=1
-        artist.num_of_shows +=1
-        db.session.add(show) 
-        db.session.commit()
-        error = False
-        flash('Show was successfully listed!')
+    startDate = str(form.start_time.data)
+    venue = Venue.query.get(venueID) if Venue.query.get(venueID)!=None else False
+    artist = Artist.query.get(artistID) if Artist.query.get(artistID)!=None else False
+    print(f'{Fore.YELLOW} V: {venue and artist} , A: {artist}')
+    if (venue and artist):
+      if not (venue.deleted and artist.deleted):
+        if (venue.seeking_talent and artist.seeking_venue ):
+          show.artist_id = artistID
+          show.venue_id = venueID
+          show.start_time = datetime.strptime(startDate, date_format)
+          venue.num_of_shows +=1
+          artist.num_of_shows +=1
+          db.session.add(show) 
+          db.session.commit()
+          error = False
+          flash('Show was successfully listed!')
+        else:
+          if not artist.seeking_venue: 
+            flash( artist.name +' is not seeking a venue - Artist ID: ' + str(artistID))
+          if ( not venue.seeking_talent):
+            flash(venue.name+ ' is not seeking talent - Venue ID: '+ str(venueID) )
       else:
-        if not artist.seeking_venue: 
-          flash( artist.name + ' is not seeking a venue - Artist ID: ' + artistID)
-        if ( not venue.seeking_talent):
-          flash(venue.name+ ' is not seeking talent - Venue ID: '+ venueID )
+        if not (artist.deleted):
+          flash('Invalid Artist Id !')
+        if not (venue.deleted ):
+          flash('Invalid Venue Id !')
     else:
-      if not (artist or artist.deleted):
+      if not (artist):
         flash('Invalid Artist Id !')
-      if not (venue or venue.deleted):
+      if not (venue):
         flash('Invalid Venue Id !')
   except Exception as e:
+    error=True
     print(f'{Fore.RED}Error ==> {e}')
     db.session.rollback()
   finally:
