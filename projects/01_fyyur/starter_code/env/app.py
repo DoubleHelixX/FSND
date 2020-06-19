@@ -811,10 +811,11 @@ def edit_venue(venue_id):
   error=False
   try:
     print(f"{Fore.RED} IN HERE: ", venue_id)
-    form = VenueForm()
     currentVenue = db.session.query(Venue).get(venue_id)
-    print(f"{Fore.RED} currentVenue: ", currentVenue)
+    form = VenueForm(obj=currentVenue)
     genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentVenue.genres ))).split(',')
+    print(f"{Fore.RED} currentVenue: ", genres)
+    form.genres.data = (genres if genres else 0) # I make 0 my default
     mockVenue={
       "id": 1,
       "name": "The Musical Hop",
