@@ -503,31 +503,35 @@ def create_venue_submission():
     if error: return redirect(url_for('create_venue_submission'))
     else: return redirect(url_for('index'))
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>/delete', methods=['POST'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
- try:
-    toBeDeleted = db.session.query(Venue).filter_by(id=venue_id).all()
-    toBeDeleted[0].deleted=True
-    # commit delete changes before updating sequence
-    db.session.commit()
-    flash('Venue Deleted')
- except:
-    print('Could not delete: ' ,venue_id)
-    flash('An error occurred. Venue could not be deleted.')
-    print(sys.exc_info())
-    db.session.rollback()
- finally:
-    db.session.close()
-    return jsonify({"redirect": "/"})
+  # TODO: Complete this endpoint for taking a venue_id, and using
+  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  error=False
+  try:
+   toBeDeleted = db.session.query(Venue).filter_by(id=venue_id).all()
+   toBeDeleted[0].deleted=True
+   # commit delete changes before updating sequence
+   db.session.commit()
+   flash('Venue Deleted')
+  except:
+   error=True
+   print('Could not delete: ' ,venue_id)
+   flash('An error occurred. Venue could not be deleted.')
+   print(sys.exc_info())
+   db.session.rollback()
+  finally:
+   db.session.close()
+   if error: return redirect(url_for('show_venue', venue_id=venue_id))
+   else: return redirect(url_for('index'))
    
   
-@app.route('/artist/<artist_id>', methods=['DELETE'])
+@app.route('/artist/<artist_id>/delete', methods=['POST'])
 def delete_artist(artist_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
- try:
+  # TODO: Complete this endpoint for taking a venue_id, and using
+  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  error=True
+  try:
     # Delete clicked selection of Todo list
     #Venue.query.filter(id = venue_id).delete()
     toBeDeleted = db.session.query(Artist).filter_by(id=artist_id).all()
@@ -535,14 +539,16 @@ def delete_artist(artist_id):
     # commit delete changes before updating sequence
     db.session.commit()
     flash('Artist Deleted')
- except:
+  except:
+    db.session.rollback()
     print('Could not delete: ' ,artist_id)
     flash('An error occurred. Artist could not be deleted.')
     print(sys.exc_info())
-    db.session.rollback()
- finally:
+    error=True
+  finally:
     db.session.close()
-    return jsonify({"redirect": "/"})
+    if error: return redirect(url_for('show_artist', artist_id= artist_id))
+    else: return redirect(url_for('index'))
 
 #  ----------------------------------------------------------------
 @app.route('/artists')
@@ -801,10 +807,11 @@ def edit_artist_submission(artist_id):
   return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
-def edit_venue():
+def edit_venue(venue_id):
   error=False
   try:
-    form = VenueForm(request.form)
+    print(f"{Fore.RED} IN HERE: ", venue_id)
+    form = VenueForm()
     currentVenue = db.session.query(Venue).get(venue_id)
     print(f"{Fore.RED} currentVenue: ", currentVenue)
     genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentVenue.genres ))).split(',')
@@ -840,9 +847,9 @@ def edit_venue():
     error=True
     db.rollback()
     print(f'{Fore.Yellow} Error Message: ' , identifier)
-    flash('Error when accessing Database: Contact Customer Support if issue persist.')
+    flash('Error Venue could not be edited: Contact Customer Support if issue persist.')
   finally:
-    if error: redirect(url_for('index'))
+    if error: return redirect(url_for('show_venue', venue_id=venue_id))
     else: return render_template('forms/edit_venue.html', form=form, venue=returnedData)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])

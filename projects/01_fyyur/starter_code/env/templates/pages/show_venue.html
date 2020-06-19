@@ -1,7 +1,6 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Venue Search{% endblock %}
 {% block content %}
-<script src='https://kit.fontawesome.com/a076d05399.js'></script>
 <style>
 	.venue-delete{
 		-webkit-appearance: none;
@@ -33,9 +32,12 @@
 	<div class="col-sm-6">
 		<h1 class="monospace">
 			{{ venue.name }} 
-			<button class="venue-edit far fa-edit" id='editBtn' data-id="{{ venue.id }}"></button>
-			<button class="venue-delete" id='deleteBtn' data-id="{{ venue.id }}">&cross;</button>  
-
+			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Edit the Venue?');" class="" method="GET" action="/venues/{{venue.id}}/edit">
+			<button type="submit" class="venue-edit far fa-edit" id='editBtn' data-id="{{ venue.id }}"></button>
+			</form>
+			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Delete the Venue?');" class="" method="POST" action="/venues/{{venue.id}}/delete">
+			<button type="submit" class="venue-delete" id='deleteBtn' data-id="{{ venue.id }}">&cross;</button>  
+			</form>
 			</h1>
 		<p class="subtitle">
 			ID: {{ venue.id }}
@@ -117,7 +119,8 @@
 	</div>
 </section>
 <script>
-	const deleteVenue =  document.getElementById("deleteBtn");
+	//DB call method #2 using delete request 
+/* 	const deleteVenue =  document.getElementById("deleteBtn");
 	deleteVenue.onclick = function (e) {
 	let proceed =false;
   	if (confirm("Delete Venue?")) {
@@ -144,8 +147,9 @@
 			alert('Error in DELETE request'); 
 		});
 	}
-	
-}
+	} */
+
+
 </script>
 	
 {% endblock %}
