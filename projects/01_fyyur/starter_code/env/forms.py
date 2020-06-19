@@ -124,7 +124,7 @@ class VenueForm(FlaskForm):
         'seeking_talent', default=False
     )
     seeking_description = StringField(
-        'seeking_description' #gave default values if left empty
+        'seeking_description', default=''
     )
 
 class ArtistForm(FlaskForm):
@@ -231,7 +231,7 @@ class ArtistForm(FlaskForm):
         'seeking_venue', default=False
     )
     seeking_description = StringField(
-        'seeking_description' #gave default values if left empty
+        'seeking_description', default='' #gave default values if left empty
     )
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM

@@ -42,7 +42,7 @@ class Venue(db.Model):
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120)) 
+    genres = db.Column(db.ARRAY(db.String(120))) 
     website_link = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
@@ -64,7 +64,7 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String(120)))
     image_link = db.Column(db.String(500))
     website_link = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
@@ -106,6 +106,22 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
+def manageSequence(tableName,className):
+  #COUNT METHODS - DIFFERENT APPROACHES BECAUSE COUNT() TAKES TO LONG IN LARGE DB - ***REVISION LATER***
+  #maxCount = select([func.count()]).select_from(Todo)
+  maxCount = db.session.query(className).all().count(className.id)
+  #print(maxCount)
+  #Reset the auto PK increment sequence to current max
+  alterSeq= "ALTER SEQUENCE " + tableName +"_id_seq RESTART WITH " + str(maxCount) #substitute for 1 if starting off empty with todos
+  print(alterSeq, 'OGMAGODA')
+  db.session.execute(alterSeq)
+  db.session.commit()
+  db.session.close()  
+  
+  
+#manageSequence("venue",Venue)
+#manageSequence("artist",Artist)
+#manageSequence("shows", Show)
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -358,6 +374,7 @@ def show_venue(venue_id):
       upcomingShowsCount=0
       pastShows=[]
       upcomingShows=[]
+      genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', venue.genres ))).split(',')
       if venue.num_of_shows >0:
         showsData = db.session.query(Show, Artist).filter(Show.venue_id == venue.id).filter(Artist.id == Show.artist_id).all()
         for shows in showsData:
@@ -383,7 +400,7 @@ def show_venue(venue_id):
         resultData.append({
           "id": venue.id,
           "name": venue.name,
-          "genres": [venue.genres],
+          "genres": genres,
           "address": venue.address,
           "city": venue.city,
           "state": venue.state,
@@ -401,7 +418,7 @@ def show_venue(venue_id):
         resultData.append({
           "id": venue.id,
           "name": venue.name,
-          "genres": [venue.genres],
+          "genres": genres,
           "address": venue.address,
           "city": venue.city,
           "state": venue.state,
@@ -684,6 +701,8 @@ def show_artist(artist_id):
       upcomingShowsCount=0
       pastShows=[]
       upcomingShows=[]
+      genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', artist.genres ))).split(',')
+      
       if artist.num_of_shows >0:
         showsData = db.session.query(Show, Venue).filter(Show.artist_id == artist.id).filter(Venue.id == Show.venue_id).all()
         for shows in showsData:
@@ -705,11 +724,10 @@ def show_artist(artist_id):
               "start_time": str(shows[0].start_time)
               
             })
-        
         resultData.append({
           "id": artist.id,
           "name": artist.name,
-          "genres": [artist.genres],
+          "genres": genres,
           "city": artist.city,
           "state": artist.state,
           "phone": artist.phone,
@@ -725,7 +743,7 @@ def show_artist(artist_id):
         resultData.append({
           "id": artist.id,
           "name": artist.name,
-          "genres": [artist.genres],
+          "genres": genres,
           "city": artist.city,
           "state": artist.state,
           "phone": artist.phone,
@@ -783,7 +801,7 @@ def edit_venue():
     form = VenueForm(request.form)
     currentVenue = db.session.query(Venue).get(venue_id)
     print(f"{Fore.RED} currentVenue: ", currentVenue)
-    
+    genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentVenue.genres ))).split(',')
     mockVenue={
       "id": 1,
       "name": "The Musical Hop",
@@ -801,7 +819,7 @@ def edit_venue():
     returnedData={
       "id": currentVenue.id,
       "name": currentVenue.name,
-      "genres": currentVenue.genres,
+      "genres": genres,
       "address": currentVenue.address,
       "city": currentVenue.city,
       "state": currentVenue.state,
@@ -922,6 +940,7 @@ def create_artist_submission():
       if (isinstance(a_Seeking_venue, bool) == False):
         a_Seeking_venue=True
     # TODO: insert form data as a new Venue record in the db, instead
+    print(f'{Fore.YELLOW} sdasfafdas' , a_Seeking_description)
     newArtist = Artist(name=a_Name, city=a_City , state=a_State, website_link=a_Website_link, phone=a_Phone, genres=a_Genres, image_link=a_Image_link, facebook_link=a_Facebook_link,seeking_venue=a_Seeking_venue, seeking_description=a_Seeking_description)
     # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
     # TODO: modify data to be the data object returned from db insertion
@@ -1075,6 +1094,7 @@ if not app.debug:
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
+
 
 # Default port:
 if __name__ == '__main__':
