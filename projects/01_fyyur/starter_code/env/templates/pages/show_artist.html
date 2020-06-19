@@ -12,12 +12,29 @@
 		background-color: white;
 		
 	  }
+
+	  .artist-edit  {
+		-webkit-appearance: none;
+		border-style: ridge;
+		outline: none;
+		color: rgb(0, 0, 0);
+		cursor: pointer;
+		font-size: 22px;
+		background-color: white;
+		padding: .1599em .15em .175em .25em;
+		position: relative;
+		top: 0px;
+		right: 0px
+		
+	  }
 </style>
 		
 <div class="row">
 	<div class="col-sm-6">
 		<h1 class="monospace">
-			{{ artist.name }} <button class="artist-delete" id='btn' data-id="{{ artist.id }}">&cross;</button>
+			{{ artist.name }} 
+			<button class="artist-edit far fa-edit" id='editBtn' data-id="{{ artist.id }}"></button>
+			<button class="artist-delete" id='deleteBtn' data-id="{{ artist.id }}">&cross;</button>
 		</h1>
 		<p class="subtitle">
 			ID: {{ artist.id }}
@@ -95,7 +112,7 @@
 	</div>
 </section>
 <script>
-	const deleteArtist =  document.getElementById("btn");
+	const deleteArtist =  document.getElementById("deleteBtn");
 	deleteArtist.onclick = function (e) {
 	let proceed =false;
   	if (confirm("Delete Artist?")) {

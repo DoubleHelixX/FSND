@@ -1,8 +1,9 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Venue Search{% endblock %}
 {% block content %}
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
 <style>
-	.venue-delete {
+	.venue-delete{
 		-webkit-appearance: none;
 		border-style: ridge;
 		outline: none;
@@ -12,12 +13,29 @@
 		background-color: white;
 		
 	  }
+	  .venue-edit  {
+		-webkit-appearance: none;
+		border-style: ridge;
+		outline: none;
+		color: rgb(0, 0, 0);
+		cursor: pointer;
+		font-size: 22px;
+		background-color: white;
+		padding: .1599em .15em .175em .25em;
+		position: relative;
+		top: 0px;
+		right: 0px
+		
+	  }
 </style>
 		
 <div class="row">
 	<div class="col-sm-6">
 		<h1 class="monospace">
-			{{ venue.name }} <button class="venue-delete" id='btn' data-id="{{ venue.id }}">&cross;</button>
+			{{ venue.name }} 
+			<button class="venue-edit far fa-edit" id='editBtn' data-id="{{ venue.id }}"></button>
+			<button class="venue-delete" id='deleteBtn' data-id="{{ venue.id }}">&cross;</button>  
+
 			</h1>
 		<p class="subtitle">
 			ID: {{ venue.id }}
@@ -99,7 +117,7 @@
 	</div>
 </section>
 <script>
-	const deleteVenue =  document.getElementById("btn");
+	const deleteVenue =  document.getElementById("deleteBtn");
 	deleteVenue.onclick = function (e) {
 	let proceed =false;
   	if (confirm("Delete Venue?")) {
