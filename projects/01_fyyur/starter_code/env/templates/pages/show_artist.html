@@ -42,9 +42,11 @@
 		{% if artist.seeking_venue %}
 		<div class="seeking">
 			<p class="lead">Currently seeking performance venues</p>
+			{% if artist.seeking_description %}
 			<div class="description">
 				<i class="fas fa-quote-left"></i> {{ artist.seeking_description }} <i class="fas fa-quote-right"></i>
 			</div>
+			{% endif %}
 		</div>
 		{% else %}	
 		<p class="not-seeking">

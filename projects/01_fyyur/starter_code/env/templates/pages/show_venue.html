@@ -45,9 +45,11 @@
 		{% if venue.seeking_talent %}
 		<div class="seeking">
 			<p class="lead">Currently seeking talent</p>
+			{% if venue.seeking_description %}
 			<div class="description">
 				<i class="fas fa-quote-left"></i> {{ venue.seeking_description }} <i class="fas fa-quote-right"></i>
 			</div>
+			{% endif %}
 		</div>
 		{% else %}	
 		<p class="not-seeking">
