@@ -385,7 +385,8 @@ def show_venue(venue_id):
             "artist_id": shows[1].id,
             "artist_name": shows[1].name,
             "artist_image_link": shows[1].image_link,
-            "start_time": str(shows[0].start_time)
+            "start_time": str(shows[0].start_time),
+            "deleted": shows[1].deleted,
             })
           else: 
             pastShowsCount +=1
@@ -393,8 +394,8 @@ def show_venue(venue_id):
               "artist_id": shows[1].id,
               "artist_name": shows[1].name,
               "artist_image_link": shows[1].image_link,
-              "start_time": str(shows[0].start_time)
-              
+              "start_time": str(shows[0].start_time),
+              "deleted": shows[1].deleted,
             })
         
         resultData.append({
@@ -715,7 +716,8 @@ def show_artist(artist_id):
             "venue_id": shows[1].id,
             "venue_name": shows[1].name,
             "venue_image_link": shows[1].image_link,
-            "start_time": str(shows[0].start_time)
+            "start_time": str(shows[0].start_time),
+            "deleted": shows[1].deleted,
             })
           else: 
             pastShowsCount +=1
@@ -723,9 +725,9 @@ def show_artist(artist_id):
               "venue_id": shows[1].id,
               "venue_name": shows[1].name,
               "venue_image_link": shows[1].image_link,
-              "start_time": str(shows[0].start_time)
-              
-            })
+              "start_time": str(shows[0].start_time),
+              "deleted": shows[1].deleted,
+          })
         resultData.append({
           "id": artist.id,
           "name": artist.name,
