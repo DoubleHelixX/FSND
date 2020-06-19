@@ -837,7 +837,7 @@ def edit_venue(venue_id):
       "city": currentVenue.city,
       "state": currentVenue.state,
       "phone": currentVenue.phone,
-      "website": currentVenue.website_link,
+      "website_link": currentVenue.website_link,
       "facebook_link": currentVenue.facebook_link,
       "seeking_talent": currentVenue.seeking_talent,
       "seeking_description": currentVenue.seeking_description,
