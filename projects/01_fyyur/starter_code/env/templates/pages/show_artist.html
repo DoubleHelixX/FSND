@@ -36,7 +36,7 @@
 			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Edit Artist?');" class="" method="GET" action="/artists/{{artist.id}}/edit">
 			<button class="artist-edit far fa-edit" id='editBtn' data-id="{{ artist.id }}"></button>
 			</form>
-			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Delete Artist?');" class="" method="POST" action="/artist/{{artist.id}}/delete">
+			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Delete Artist?');" class="" method="POST" action="/artists/{{artist.id}}/delete">
 			<button class="artist-delete" id='deleteBtn' data-id="{{ artist.id }}">&cross;</button>
 			</form>
 		</h1>

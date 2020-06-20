@@ -355,7 +355,7 @@ def show_venue(venue_id):
         showsData = db.session.query(Show, Artist).filter(Show.venue_id == venue.id).filter(Artist.id == Show.artist_id).all()
         for shows in showsData:
           print(f'{Fore.YELLOW} shows: {shows}')
-          if shows[0].start_time > datetime.today(): 
+          if shows[0].start_time > datetime.today() and not (shows[1].deleted or venue.deleted): 
             upcomingShowsCount +=1
             upcomingShows.append({
             "artist_id": shows[1].id,
@@ -620,7 +620,7 @@ def show_artist(artist_id):
         showsData = db.session.query(Show, Venue).filter(Show.artist_id == artist.id).filter(Venue.id == Show.venue_id).all()
         for shows in showsData:
           print(f'{Fore.YELLOW} shows: {shows}')
-          if shows[0].start_time > datetime.today(): 
+          if shows[0].start_time > datetime.today() and not (shows[1].deleted or artist.deleted): 
             upcomingShowsCount +=1
             upcomingShows.append({
             "venue_id": shows[1].id,
@@ -1014,12 +1014,14 @@ def shows():
     for shows in showsData:
       if shows[1].deleted and shows[2].deleted:
         shows[0].deleted= True
-      if not shows[0].deleted: 
+      if not (shows[0].deleted or shows[1].deleted or shows[2].deleted): 
         resultData.append({
         "venue_id": shows[2].id,
         "venue_name": shows[2].name,
+        "venue_deleted": shows[2].deleted,
         "artist_id": shows[1].id,
         "artist_name": shows[1].name,
+        "artist_deleted": shows[1].deleted,
         "artist_image_link": shows[1].image_link,
         "start_time": str(shows[0].start_time)
       })
