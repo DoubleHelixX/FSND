@@ -33,7 +33,7 @@
 	<div class="col-sm-6">
 		<h1 class="monospace">
 			{{ artist.name }} 
-			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Edit Artist?');" class="" method="GET" action="/artist/{{artist.id}}/edit">
+			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Edit Artist?');" class="" method="GET" action="/artists/{{artist.id}}/edit">
 			<button class="artist-edit far fa-edit" id='editBtn' data-id="{{ artist.id }}"></button>
 			</form>
 			<form style="display: inline; margin: 0;" onsubmit= "return confirm('Delete Artist?');" class="" method="POST" action="/artist/{{artist.id}}/delete">

@@ -526,7 +526,7 @@ def delete_venue(venue_id):
    else: return redirect(url_for('index'))
    
   
-@app.route('/artist/<artist_id>/delete', methods=['POST'])
+@app.route('/artists/<artist_id>/delete', methods=['POST'])
 def delete_artist(artist_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
@@ -782,22 +782,33 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-  form = ArtistForm()
-  artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
-  # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=artist)
+  error=False
+  try:
+    currentArtist = db.session.query(Artist).get(artist_id)
+    form = ArtistForm(obj=currentArtist)
+    genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentArtist.genres ))).split(',')
+    form.genres.data = (genres if genres else 0) # I make 0 my default
+    returnedData={
+      "id": currentArtist.id,
+      "name": currentArtist.name,
+      "genres": genres,
+      "city": currentArtist.city,
+      "state": currentArtist.state,
+      "phone": currentArtist.phone,
+      "website_link": currentArtist.website_link,
+      "facebook_link": currentArtist.facebook_link,
+      "seeking_venue": currentArtist.seeking_venue,
+      "seeking_description": currentArtist.seeking_description,
+      "image_link": currentArtist.image_link
+    }
+  except expression as identifier:
+    error=True
+    db.rollback()
+    print(f'{Fore.Yellow} Error Message: ' , identifier)
+    flash('Error Artist could not be edited: Contact Customer Support if issue persist.')
+  finally:
+    if error: return redirect(url_for('show_artist', artist_id=artist_id))
+    else: return render_template('forms/edit_artist.html', form=form, artist=returnedData)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
