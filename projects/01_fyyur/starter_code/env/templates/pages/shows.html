@@ -8,13 +8,13 @@
             <img src="{{ show.artist_image_link }}" alt="Artist Image" />
             <h4>{{ show.start_time|datetime('full') }}</h4>
             {%if show.artist_deleted%}
-                <h5 style="color: black; text-decoration:line-through red ">{{ show.artist_name }}</h5>
+                <h5 style="color: black; ">{{ show.artist_name }}: &#9940;</h5>
             {%else%}
                 <h5><a href="/artists/{{ show.artist_id }}">{{ show.artist_name }}</a></h5>
             {%endif%}
             <p>playing at</p>
             {%if show.venue_deleted%}
-                <h5 style="color: black; text-decoration:line-through red ">{{ show.venue_name }}</h5>
+                <h5 style="color: black; ;">{{ show.venue_name }}: &#9940;</h5>
             {%else%}
             <h5><a href="/venues/{{ show.venue_id }}">{{ show.venue_name }}</a></h5>
             {%endif%}

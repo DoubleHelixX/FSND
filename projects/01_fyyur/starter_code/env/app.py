@@ -141,64 +141,33 @@ def venues():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   error=False
   try:
-    returnData = []
-    dbData = db.session.query(Venue).filter(Venue.deleted == False).order_by('id').all()
-    rowArryCheck = []
-    areaData = []
-    venuesData = []
-    error=False
-    
-    #print('data2: ', dbData)
-    for row in dbData:
-      #print('rowindy: ' , rowIndex)
-      rowIndex=0
-      cityData=0
-      print(f'{Fore.YELLOW} omgg :')
-      venueListings = Venue.query.filter(Venue.state==row.state).filter(Venue.city == row.city).filter(Venue.deleted==False).order_by('id').all()
-      print(f'{Fore.YELLOW} Venuelisting :  ' , venueListings)
-      for i in venueListings:
-        upcoming_shows = 0
-        matchedVenues = Show.query.filter(Show.venue_id == i.id).filter(Show.deleted==False).all()
-        if(matchedVenues):
-          for venues in matchedVenues:
-            if venues.start_time > datetime.today(): upcoming_shows =+1      
-        if ((i.id in rowArryCheck) == False):
-          rowArryCheck.append(i.id)
-          if(rowIndex>0):
-            if((i.city) in areaData):
-                venuesData.append({
-                "city": "",
-                "state": "",
-                "venues":[{
-                "id": i.id,
-                "name": i.name,
-                "num_upcoming_shows": upcoming_shows,
-              }]
-                })
-            else:
-                venuesData.append({
-                "city": i.city,
-                "state": i.state, # place as null to only show city
-                "venues":[{
-                "id": i.id,
-                "name": i.name,
-                "num_upcoming_shows": upcoming_shows,
-              }]
-                })
-                areaData.append(i.city)
-                print("after",areaData)
-          else:
-            venuesData.append({
-            "city": i.city,
-            "state": i.state,
-            "venues":[{
-            "id": i.id,
-            "name": i.name,
-            "num_upcoming_shows": upcoming_shows,
-            }]
-            })
-            areaData.append(i.city)
-            rowIndex=rowIndex+1
+    returnData=[]
+    priorArea = {"state":'',
+                "city": ''}
+    allVenues= Venue.query.filter(Venue.deleted==False).order_by('state').order_by('city').all()
+    for venue in allVenues:
+      if priorArea["state"] == venue.state and priorArea["city"] == venue.city:
+        data= {
+        "id": venue.id,
+        "name": venue.name,
+        "image_link": venue.image_link,
+        "seeking_talent":venue.seeking_talent,
+        "num_of_shows": venue.num_of_shows
+        }        
+      else:
+        data= {
+        "id": venue.id,
+        "name": venue.name,
+        "image_link": venue.image_link,
+        "state": venue.state,
+        "city": venue.city,
+        "seeking_talent":venue.seeking_talent,
+        "num_of_shows": venue.num_of_shows
+        }
+        
+        priorArea["state"]= venue.state
+        priorArea["city"] = venue.city        
+      returnData.append(data)
   except():
     flash('An error occurred listing the Venues. Redirecting to home page')
     error =True
@@ -206,7 +175,7 @@ def venues():
     if(error):
       return redirect(url_for("index"))
     else:
-      return render_template('pages/venues.html', areas=venuesData)
+      return render_template('pages/venues.html', venues=returnData)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -542,12 +511,34 @@ def artists():
     "name": "The Wild Sax Band",
     }]
     returnData=[]
-    allArtist= Artist.query.filter(Artist.deleted==False).order_by('id').all()
+    priorArea = {"state":'',
+                "city": ''}
+        
+    allArtist= Artist.query.filter(Artist.deleted==False).order_by('state').order_by('city').all()
     for artist in allArtist:
-      data= {
-      "id": artist.id,
-      "name": artist.name
-      }
+      if priorArea["state"] == artist.state and priorArea["city"] == artist.city:
+        data= {
+        "id": artist.id,
+        "name": artist.name,
+        "image_link": artist.image_link,
+        "seeking_venue":artist.seeking_venue,
+        "num_of_shows": artist.num_of_shows
+        }        
+      else:
+        data= {
+        "id": artist.id,
+        "name": artist.name,
+        "image_link": artist.image_link,
+        "state": artist.state,
+        "city": artist.city,
+        "seeking_venue":artist.seeking_venue,
+        "num_of_shows": artist.num_of_shows
+        }
+        
+        priorArea["state"]= artist.state
+        priorArea["city"] = artist.city
+        print(f'{Fore.YELLOW} whaaa {priorArea} , {priorArea["state"]}, {priorArea["city"]}')
+        
       returnData.append(data)
   except:
     print(f'{Fore.RED} Error: ', sys.exc_info())
@@ -1014,7 +1005,7 @@ def shows():
     for shows in showsData:
       if shows[1].deleted and shows[2].deleted:
         shows[0].deleted= True
-      if not (shows[0].deleted or shows[1].deleted or shows[2].deleted): 
+      if not (shows[0].deleted ): 
         resultData.append({
         "venue_id": shows[2].id,
         "venue_name": shows[2].name,

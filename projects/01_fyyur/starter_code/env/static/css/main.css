@@ -115,6 +115,9 @@ ul.items > li:hover {
   cursor: pointer;
 }
 ul.items > li:hover h5 {
+  color: black;
+}
+ul.items > li:hover h4 {
   color: orange;
 }
 .item {
@@ -265,5 +268,42 @@ h2.monospace {
   position: absolute;
   left: -100vw;
   
+  
   /* Note, you may want to position the checkbox over top the label and set the opacity to zero instead. It can be better for accessibilty on some touch devices for discoverability. */
+}
+.items li { display: inline;}
+.items .artist_hover_img  {position:absolute; display:none; z-index:99; }
+.items .venue_hover_img  {position:absolute; display:none; z-index:99; }
+
+.items li:hover .artist_hover_img { 
+  display:inline; 
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: visible; 
+  position: fixed; 
+  padding: 5px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-25%, -65%);
+  
+}
+.items li:hover .venue_hover_img { 
+  display:inline; 
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: visible; 
+  position: fixed; 
+  padding: 5px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-25%, -65%);
+  
+}
+
+.artist_hover_img img {
+  height: 150%;
+  width: 150%;
+}
+.items img:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
 }

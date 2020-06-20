@@ -2,23 +2,27 @@
 {% block title %}Fyyur | Venues{% endblock %}
 {% block content %}
 
-
-{% for area in areas %}
-<h3>{{ area.city }} {% if area.state |length > 0%}  , {{ area.state }} {%endif%}</h3>
+{% for venue in venues %}
+	{%if venue.city and venue.state %}
+			<h5> {{ venue.city }} , {{ venue.state }} </h5>
+		{%endif%}
 	<ul class="items">
-		{% for venue in area.venues %}
 		<li>
 			<a href="/venues/{{ venue.id }}">
 				<i class="fas fa-music"></i>
 				<div class="item">
-					<h5>{{ venue.name }}</h5>
+					<h4>{{ venue.name }}</h4>
 				</div>
 			</a>
 			<div class = 'floater'>
 			</div>
+		{%if venue.image_link%}
+			<span class="venue_hover_img">
+				<img src= "{{ venue.image_link }}" alt="image"/>
+			</span>
+		{%endif%}
 
 		</li>
-		{% endfor %}
+	{% endfor %}
 	</ul>
-{% endfor %}
 {% endblock %}

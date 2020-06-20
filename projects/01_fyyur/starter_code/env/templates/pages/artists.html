@@ -4,14 +4,23 @@
 
 <ul class="items">
 	{% for artist in artists %}
+		{%if artist.city and artist.state %}
+			<h5> {{ artist.city }} , {{ artist.state }} </h5>
+		{%endif%}
 	<li>
-		<a href="/artists/{{ artist.id }}">
+		<a  href="/artists/{{ artist.id }}">
 			<i class="fas fa-users"></i>
 			<div class="item">
-				<h5>{{ artist.name }}</h5>
+				<h4>  {{ artist.name }}</h4>
 			</div>
 		</a>
+		{%if artist.image_link%}
+		<span class="artist_hover_img">
+			<img src= "{{ artist.image_link }}" alt="image"/>
+		</span>
+		{%endif%}
 	</li>
+	
 	{% endfor %}
 </ul>
 {% endblock %}
