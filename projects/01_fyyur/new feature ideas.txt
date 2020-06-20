@@ -1,0 +1,11 @@
+Search feature for Shows - can search artist or venue 
+Advance search capabilities
+show search by desc or asc
+add perefct match, near match, poor match results for searchs
+
+fix mobile responsiveness for photos showing in venues/artist page
+have past or upcoming shows catogorys in shows page
+add user login - account info, etc (WILL BE ALOT OF WORK lawls ;) ;( )
+
+
+//add more below
