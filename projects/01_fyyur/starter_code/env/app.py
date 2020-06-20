@@ -1001,7 +1001,7 @@ def shows():
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
     }]
-    showsData = db.session.query(Show, Artist, Venue).filter(Show.artist_id == Artist.id).filter(Venue.id == Show.venue_id).all()
+    showsData = db.session.query(Show, Artist, Venue).filter(Show.artist_id == Artist.id).filter(Venue.id == Show.venue_id).order_by(Show.start_time.desc()).all()
     for shows in showsData:
       if shows[1].deleted and shows[2].deleted:
         shows[0].deleted= True
