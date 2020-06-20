@@ -141,30 +141,6 @@ def venues():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   error=False
   try:
-    #maxCount = db.session.query(Venue.id).count()
-    #print("maxCount", maxCount)
-    mockData = [{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-    }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-    }]
-    
     returnData = []
     dbData = db.session.query(Venue).filter(Venue.deleted == False).order_by('id').all()
     rowArryCheck = []
@@ -261,7 +237,7 @@ def search_venues():
       if(matchedVenues):
         for venues in matchedVenues:
           if venues.start_time > datetime.today(): upcoming_shows =+1
-      if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
+      if searchTerm in row.name.lower():
         unfilteredMatch.append({
         "id": row.id,
         "name": row.name.title(),
@@ -607,7 +583,7 @@ def search_artists():
       if(matchedVenues):
         for venues in matchedVenues:
           if venues.start_time > datetime.today(): upcoming_shows =+1
-      if(row.name.lower() == searchTerm or row.name.lower().startswith(searchTerm)):
+      if searchTerm in row.name.lower():
         unfilteredMatch.append({
         "id": row.id,
         "name": row.name.title(),
