@@ -632,78 +632,6 @@ def show_artist(artist_id):
   error =True
   try:
     resultData=[]
-    data1={
-      "id": 4,
-      "name": "Guns N Petals",
-      "genres": ["Rock n Roll"],
-      "city": "San Francisco",
-      "state": "CA",
-      "phone": "326-123-5000",
-      "website": "https://www.gunsnpetalsband.com",
-      "facebook_link": "https://www.facebook.com/GunsNPetals",
-      "seeking_venue": True,
-      "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-      "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-      "past_shows": [{
-        "venue_id": 1,
-        "venue_name": "The Musical Hop",
-        "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-        "start_time": "2019-05-21T21:30:00.000Z"
-      }],
-      "upcoming_shows": [],
-      "past_shows_count": 1,
-      "upcoming_shows_count": 0,
-    }
-    data2={
-      "id": 5,
-      "name": "Matt Quevedo",
-      "genres": ["Jazz"],
-      "city": "New York",
-      "state": "NY",
-      "phone": "300-400-5000",
-      "facebook_link": "https://www.facebook.com/mattquevedo923251523",
-      "seeking_venue": False,
-      "image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-      "past_shows": [{
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-        "start_time": "2019-06-15T23:00:00.000Z"
-      }],
-      "upcoming_shows": [],
-      "past_shows_count": 1,
-      "upcoming_shows_count": 0,
-    }
-    data3={
-      "id": 6,
-      "name": "The Wild Sax Band",
-      "genres": ["Jazz", "Classical"],
-      "city": "San Francisco",
-      "state": "CA",
-      "phone": "432-325-5432",
-      "seeking_venue": False,
-      "image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-      "past_shows": [],
-      "upcoming_shows": [{
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-        "start_time": "2035-04-01T20:00:00.000Z"
-      }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-        "start_time": "2035-04-08T20:00:00.000Z"
-      }, {
-        "venue_id": 3,
-        "venue_name": "Park Square Live Music & Coffee",
-        "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-        "start_time": "2035-04-15T20:00:00.000Z"
-      }],
-      "past_shows_count": 0,
-      "upcoming_shows_count": 3,
-    }
-    
     artistsData = db.session.query(Artist).filter(Artist.deleted == False).all()
     for artist in artistsData:
       pastShowsCount =0
@@ -783,94 +711,168 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   error=False
+  deletedError=False
   try:
     currentArtist = db.session.query(Artist).get(artist_id)
-    form = ArtistForm(obj=currentArtist)
-    genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentArtist.genres ))).split(',')
-    form.genres.data = (genres if genres else 0) # I make 0 my default
-    returnedData={
-      "id": currentArtist.id,
-      "name": currentArtist.name,
-      "genres": genres,
-      "city": currentArtist.city,
-      "state": currentArtist.state,
-      "phone": currentArtist.phone,
-      "website_link": currentArtist.website_link,
-      "facebook_link": currentArtist.facebook_link,
-      "seeking_venue": currentArtist.seeking_venue,
-      "seeking_description": currentArtist.seeking_description,
-      "image_link": currentArtist.image_link
-    }
+    if not currentArtist.deleted:
+      form = ArtistForm(obj=currentArtist)
+      genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentArtist.genres ))).split(',')
+      form.genres.data = (genres if genres else 0) # I make 0 my default
+      returnedData={
+        "id": currentArtist.id,
+        "name": currentArtist.name,
+        "genres": genres,
+        "city": currentArtist.city,
+        "state": currentArtist.state,
+        "phone": currentArtist.phone,
+        "website_link": currentArtist.website_link,
+        "facebook_link": currentArtist.facebook_link,
+        "seeking_venue": currentArtist.seeking_venue,
+        "seeking_description": currentArtist.seeking_description,
+        "image_link": currentArtist.image_link
+      }
+    else: 
+      deletedError=True
+      flash("Artist Doesn't Exist")
   except expression as identifier:
     error=True
     db.rollback()
     print(f'{Fore.Yellow} Error Message: ' , identifier)
     flash('Error Artist could not be edited: Contact Customer Support if issue persist.')
   finally:
-    if error: return redirect(url_for('show_artist', artist_id=artist_id))
-    else: return render_template('forms/edit_artist.html', form=form, artist=returnedData)
+    db.session.close()
+    if deletedError: return redirect(url_for('index'))
+    else:
+      if error: return redirect(url_for('show_artist', artist_id=artist_id))
+      else: return render_template('forms/edit_artist.html', form=form, artist=returnedData)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+  error=False
+  deletedError=False
+  try:
+    form = ArtistForm(request.form)
+    # retrieve the form values
+    aName=form.name.data
+    aCity=form.city.data.title()
+    aState=form.state.data
+    aPhone=form.phone.data
+    aGenres=form.genres.data
+    aWebsite_link = form.website_link.data
+    aImage_link=form.image_link.data
+    aFacebook_link=form.facebook_link.data
+    aSeeking_description=form.seeking_description.data
+    #Retrieve BooleanField values and test them. work around hack - BooleanField is buggy
+    try:
+      #If it can't read it and causes error its not clicked indicating false
+      aSeeking_venue= form.seeking_venue.data
+    except:
+      #set it to false
+      aSeeking_venue=False
+    finally:
+      #if the return value is 'y' or anything else other than a bool then set to true
+      if (isinstance(aSeeking_venue, bool) == False):
+        aSeeking_venue=True            
+    # TODO: insert form data as a new Venue record in the db, instead
+    currentArtistData = Artist.query.get(artist_id)
+    if not currentArtistData.deleted:
+      currentArtistData.name=aName
+      currentArtistData.city=aCity
+      currentArtistData.state=aState
+      currentArtistData.phone=aPhone
+      currentArtistData.genres=aGenres
+      currentArtistData.image_link=aImage_link
+      currentArtistData.facebook_link=aFacebook_link
+      currentArtistData.seeking_venue=aSeeking_venue
+      currentArtistData.seeking_description=aSeeking_description
+      currentArtistData.website_link = aWebsite_link     
+      # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
+      # TODO: modify data to be the data object returned from db insertion
+      db.session.add(currentArtistData)
+      # on successful db insert, flash success
+      db.session.commit()
+      flash('Venue ' + aName + ' was successfully updated!')
+    else: 
+      deletedError=True
+      flash("Artist Doesn't Exist")
+  except:
+    error=True
+    db.session.rollback()
+    print(sys.exc_info())
+    # TODO: on unsuccessful db insert, flash an error instead.
+    flash('An error occurred. Venue ' + aName + ' could not be edited.')
+    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  finally:
+    db.session.close()
+    if deletedError: return redirect(url_for('index'))
+    if error: return render_template('/artists/{artist_id}/edit')
+    else: return redirect(url_for('show_artist', artist_id=artist_id))
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   error=False
+  deletedError=False
   try:
-    print(f"{Fore.RED} IN HERE: ", venue_id)
     currentVenue = db.session.query(Venue).get(venue_id)
-    form = VenueForm(obj=currentVenue)
-    genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentVenue.genres ))).split(',')
-    print(f"{Fore.RED} currentVenue: ", genres)
-    form.genres.data = (genres if genres else 0) # I make 0 my default
-    mockVenue={
-      "id": 1,
-      "name": "The Musical Hop",
-      "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-      "address": "1015 Folsom Street",
-      "city": "San Francisco",
-      "state": "CA",
-      "phone": "123-123-1234",
-      "website": "https://www.themusicalhop.com",
-      "facebook_link": "https://www.facebook.com/TheMusicalHop",
-      "seeking_talent": True,
-      "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-      "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    returnedData={
-      "id": currentVenue.id,
-      "name": currentVenue.name,
-      "genres": genres,
-      "address": currentVenue.address,
-      "city": currentVenue.city,
-      "state": currentVenue.state,
-      "phone": currentVenue.phone,
-      "website_link": currentVenue.website_link,
-      "facebook_link": currentVenue.facebook_link,
-      "seeking_talent": currentVenue.seeking_talent,
-      "seeking_description": currentVenue.seeking_description,
-      "image_link": currentVenue.image_link
-    }
+    if not currentVenue.deleted:
+      form = VenueForm(obj=currentVenue)
+      genres=''.join(list(filter(lambda x : x!= '{' and x!='}' and x!='"', currentVenue.genres ))).split(',')
+      print(f"{Fore.RED} currentVenue: ", genres)
+      form.genres.data = (genres if genres else 0) # I make 0 my default
+      mockVenue={
+        "id": 1,
+        "name": "The Musical Hop",
+        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
+        "address": "1015 Folsom Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "phone": "123-123-1234",
+        "website": "https://www.themusicalhop.com",
+        "facebook_link": "https://www.facebook.com/TheMusicalHop",
+        "seeking_talent": True,
+        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
+        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
+      }
+      returnedData={
+        "id": currentVenue.id,
+        "name": currentVenue.name,
+        "genres": genres,
+        "address": currentVenue.address,
+        "city": currentVenue.city,
+        "state": currentVenue.state,
+        "phone": currentVenue.phone,
+        "website_link": currentVenue.website_link,
+        "facebook_link": currentVenue.facebook_link,
+        "seeking_talent": currentVenue.seeking_talent,
+        "seeking_description": currentVenue.seeking_description,
+        "image_link": currentVenue.image_link
+      }
+    else: 
+      deletedError=True
+      flash("Venue Doesn't Exist")
   except expression as identifier:
     error=True
     db.rollback()
     print(f'{Fore.Yellow} Error Message: ' , identifier)
     flash('Error Venue could not be edited: Contact Customer Support if issue persist.')
   finally:
-    if error: return redirect(url_for('show_venue', venue_id=venue_id))
-    else: return render_template('forms/edit_venue.html', form=form, venue=returnedData)
+    db.session.close()
+    if deletedError: return redirect(url_for('index'))
+    else:
+      if error: return redirect(url_for('show_venue', venue_id=venue_id))
+      else: return render_template('forms/edit_venue.html', form=form, venue=returnedData)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   error=False
+  deletedError=False
   try:
     form = VenueForm(request.form)
+    print(f'{Fore.BLUE} in hurrr: ' , 1)
     # retrieve the form values
     vName=form.name.data
     vCity=form.city.data.title()
@@ -892,27 +894,30 @@ def edit_venue_submission(venue_id):
     finally:
       #if the return value is 'y' or anything else other than a bool then set to true
       if (isinstance(vSeeking_talent, bool) == False):
-        vSeeking_talent=True
-                
+        vSeeking_talent=True            
     # TODO: insert form data as a new Venue record in the db, instead
-    currentVenueData = db.session.query(Venue).get(venue_id).all()
-    currentVenueData.name=vName
-    currentVenueData.city=vCity
-    currentVenueData.state=vState
-    currentVenueData.address=vAddress
-    currentVenueData.phone=vPhone
-    currentVenueData.genres=vGenrescurrentVenueData
-    currentVenueData.image_link=vImage_link
-    currentVenueData.facebook_link=vFacebook_link
-    currentVenueData.seeking_talent=vSeeking_talent
-    currentVenueData.seeking_description=vSeeking_description
-    currentVenueData.website_link = vWebsite_link 
-    # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
-    # TODO: modify data to be the data object returned from db insertion
-    db.session.add(currentVenueData)
-    # on successful db insert, flash success
-    db.session.commit()
-    flash('Venue ' + vName + ' was successfully listed!')
+    currentVenueData = Venue.query.get(venue_id)
+    if not currentVenueData.deleted:
+      currentVenueData.name=vName
+      currentVenueData.city=vCity
+      currentVenueData.state=vState
+      currentVenueData.address=vAddress
+      currentVenueData.phone=vPhone
+      currentVenueData.genres=vGenres
+      currentVenueData.image_link=vImage_link
+      currentVenueData.facebook_link=vFacebook_link
+      currentVenueData.seeking_talent=vSeeking_talent
+      currentVenueData.seeking_description=vSeeking_description
+      currentVenueData.website_link = vWebsite_link     
+      # print('Printing new venue obj: ' ,newVenue , ' || ' ,newVenue.query.all())
+      # TODO: modify data to be the data object returned from db insertion
+      db.session.add(currentVenueData)
+      # on successful db insert, flash success
+      db.session.commit()
+      flash('Venue ' + vName + ' was successfully updated!')
+    else: 
+      deletedError=True
+      flash("Venue doesn't Exist")
   except:
     error=True
     db.session.rollback()
@@ -922,8 +927,10 @@ def edit_venue_submission(venue_id):
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   finally:
     db.session.close()
-    if error: return redirect(url_for('index'))
-    else: return redirect(url_for('show_venue', venue_id=venue_id))
+    if deletedError: return redirect(url_for('index'))
+    else:
+      if error: return render_template('/venues/{venue_id}/edit')
+      else: return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
@@ -1046,6 +1053,7 @@ def shows():
     print(identifier)
     flash('An error occurred.')
   finally:
+    db.session.close()
     return render_template('pages/shows.html', shows=resultData)
 
 @app.route('/shows/create')
