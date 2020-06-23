@@ -9,6 +9,10 @@ add user login - account info, etc (WILL BE ALOT OF WORK lawls ;) ;( )
 
 
 //add more below
-
+change multiple .filters to .filter(_and())
+use one_or_none to check for a returned row otherwise it returns NONE
+use: %s or %d - 'string text' % (values substitures). Ex below:
+    print ('%s is %d years old' % ('Joe', 42))
+    Joe is 42 years old
 
 I FINSHED :D for now.

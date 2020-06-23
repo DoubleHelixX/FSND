@@ -1,4 +1,9 @@
+flask
+sqlalchemy
+Flask-SQLAlchemy
+Flask-Migrate 
 babel
 python-dateutil==2.6.0
 flask-moment
 flask-wtf
+-U flask-cors
