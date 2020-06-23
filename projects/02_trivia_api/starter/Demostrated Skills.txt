@@ -1,0 +1,1 @@
+Demonstrated the ability to build an API from start to finish independently following best practices and principles - demonstrating a conceptual understanding of the technologies that underlie APIs like HTTP and the ability to use libraries such as FLASH, FLASH CORS, and UNIT test
