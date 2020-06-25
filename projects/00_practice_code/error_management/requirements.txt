@@ -1,0 +1,13 @@
+Flask==1.0.3
+sqlalchemy
+Flask-SQLAlchemy
+Flask-Migrate 
+babel
+python-dateutil==2.6.0
+flask-moment
+flask-wtf
+flask_script
+colorama
+psycopg2
+Flask-Cors==3.0.7
+Flask-RESTful==0.3.7
