@@ -7,8 +7,6 @@ from flaskr import create_app # has to be inside folder and named __init__. - re
 from models import setup_db, Book # has to be outside of folder for 'from' to work or use the .models if its in same directory
 from colorama import Fore , Style
 
-
-
 class BookTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
@@ -106,7 +104,24 @@ class BookTestCase(unittest.TestCase):
         res = self.client().post('/books', json=self.new_book)
         data = json.loads(res.data)
         pass
+    
+    def test_get_book_search_with_results(self):
+        res = self.client().post('/books', json={'search': 'Novel'})
+        data = json.loads(res.data)
 
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_books'])
+        self.assertEqual(len(data['books']), 4)
+
+    def test_get_book_search_without_results(self):
+        res = self.client().post('/books', json={'search': 'applejacks'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_books'], 0)
+        self.assertEqual(len(data['books']), 0)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

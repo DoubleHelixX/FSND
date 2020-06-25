@@ -15,4 +15,13 @@ use: %s or %d - 'string text' % (values substitures). Ex below:
     print ('%s is %d years old' % ('Joe', 42))
     Joe is 42 years old
 
+//USE .ILIKE sqlalchemy function
+.Filter(Venue.name.ilike('%{}%'.format(search))) where format is a function we make to return a formatted dic
+
+//Use None as a default and for testing whether things are empty
+
+//write quick functions within the venue, artist, shows classes using self to easily update or insert or etc
+
+//Create API Error handlers and UNIT TEST - .py
+
 I FINSHED :D for now.
