@@ -7,7 +7,6 @@ from flask_script import Manager
 import json
 
 database_name = "testing"
-
 database_path = "postgresql+psycopg2://{}:{}@{}/{}".format('postgres', '1','localhost:5432', database_name)
 
 db = SQLAlchemy()

@@ -3,9 +3,11 @@ import sys
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
+from flaskr import create_app # has to be inside folder and named __init__. - research more on init py files
+from models import setup_db, Book # has to be outside of folder for 'from' to work or use the .models if its in same directory
+from colorama import Fore , Style
 
-from flaskr import create_app
-from models import setup_db, Book
+
 
 class BookTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -14,8 +16,8 @@ class BookTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "bookshelf_test"
-        self.database_path = "postgres://{}:{}@{}/{}".format('student', 'student','localhost:5432', self.database_name)
+        self.database_name = "testing"
+        self.database_path = "postgresql+psycopg2://{}:{}@{}/{}".format('postgres', '1','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_book = {
@@ -74,14 +76,14 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'bad request')
     
     def test_delete_book(self):
-        res = self.client().delete('/books/1')
+        res = self.client().delete('/books/6')
         data = json.loads(res.data)
 
-        book = Book.query.filter(Book.id == 1).one_or_none()
+        book = Book.query.filter(Book.id == 6).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 1)
+        self.assertEqual(data['deleted'], 6)
         self.assertTrue(data['total_books'])
         self.assertTrue(len(data['books']))
         self.assertEqual(book, None)
