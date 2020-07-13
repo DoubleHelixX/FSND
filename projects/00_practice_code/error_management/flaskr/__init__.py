@@ -131,7 +131,7 @@ def create_app(test_config=None):
     except:
       abort(422)
 
-  # @TODO: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
+  #  DONE: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
   #        the body argument is called 'search' coming from the frontend. 
   #        If you use a different argument, make sure to update it in the frontend code. 
   #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term

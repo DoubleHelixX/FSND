@@ -52,7 +52,7 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
     
-    # @TODO: Write tests for search - at minimum two
+    # @DONE: Write tests for search - at minimum two
     #        that check a response when there are results and when there are none
 
     def test_update_book_rating(self):
